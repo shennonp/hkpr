@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Media List — Fireblocks PR</title>
+<title>Hokku PR — Media Database</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -174,8 +174,8 @@ code{font-family:'DM Mono',monospace;font-size:11px;background:var(--cream);padd
 <body>
 
 <header>
-  <h1>FIREBLOCKS PR</h1>
-  <span class="sub">Media List</span>
+  <h1>HOKKU PR</h1>
+  <span class="sub">Media Database</span>
   <div class="hdr-right">
     <div class="sync-pill offline" id="syncPill">
       <span class="dot"></span>
@@ -409,7 +409,7 @@ async function connectDB(){
     // Otherwise create a new bin
     const res = await apiPost('/b', key, {
       reporters: SEED_DATA,
-      meta: { app:'fb_pr_media_list', created: new Date().toISOString() }
+      meta: { app:'hokku_pr_media_db', created: new Date().toISOString() }
     });
     const binId = res.metadata.id;
     DB = SEED_DATA;
