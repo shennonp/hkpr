@@ -217,8 +217,7 @@ code{font-family:'DM Mono',monospace;font-size:11px;background:var(--cream);padd
       </div>
       <table id="tbl" style="display:none">
         <thead><tr>
-          <th>Reporter</th><th>Email</th><th>Outlet</th>
-          <th>Sector</th><th>Country</th><th>Type</th><th>Notes</th><th></th>
+          <th>Outlet</th><th>Reporter</th><th>Email</th><th>Sector</th><th>Type</th><th>Country</th><th>Notes</th><th></th>
         </tr></thead>
         <tbody id="tbody"></tbody>
       </table>
@@ -597,12 +596,12 @@ function render(){
   empty.classList.remove('on'); tbl.style.display = '';
 
   document.getElementById('tbody').innerHTML = rows.map(r=>`<tr>
+    <td>${x(r.outlet)}</td>
     <td class="n">${x(r.name)}</td>
     <td class="em">${x(r.email)}</td>
-    <td>${x(r.outlet)}</td>
     <td>${r.sector  ?`<span class="tag ts">${x(r.sector)}</span>` :'—'}</td>
-    <td>${r.country ?`<span class="tag tc">${x(r.country)}</span>`:'—'}</td>
     <td>${r.type    ?`<span class="tag tt">${x(r.type)}</span>`   :'—'}</td>
+    <td>${r.country ?`<span class="tag tc">${x(r.country)}</span>`:'—'}</td>
     <td class="nt">${x(r.notes)}</td>
     <td><div class="act-btns">
       <button class="act-btn btn-edit" onclick="openEdit('${r.id}')">Edit</button>
