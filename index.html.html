@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Media List — Fireblocks PR</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0A0A0F;--paper:#F5F3EE;--cream:#EDE9E0;--mid:#C8C2B4;--steel:#6B6560;
+  --red:#C8372D;--red-bg:#FBF0EF;
+  --amber:#C47B1A;--amber-bg:#FBF5EA;
+  --green:#1E7A4C;--green-bg:#EDF7F2;
+  --blue:#1A4BAD;--blue-bg:#EDF2FB;
+  --border:rgba(10,10,15,0.10);
+}
+html,body{background:var(--paper);color:var(--ink);font-family:'DM Sans',sans-serif;font-size:14px;min-height:100vh}
+
+/* HEADER */
+header{background:var(--ink);padding:16px 28px;display:flex;align-items:center;gap:14px;border-bottom:3px solid var(--red);position:sticky;top:0;z-index:50}
+header h1{font-family:'Syne',sans-serif;font-weight:800;font-size:18px;color:#fff;letter-spacing:-0.02em}
+.sub{font-family:'DM Mono',monospace;font-size:10px;color:var(--mid);letter-spacing:0.1em;text-transform:uppercase}
+.hdr-right{margin-left:auto;display:flex;gap:8px;align-items:center}
+
+/* sync indicator */
+.sync-pill{display:flex;align-items:center;gap:6px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.04em;color:var(--mid);border:1px solid rgba(255,255,255,0.12);padding:5px 10px;border-radius:3px;white-space:nowrap}
+.sync-pill .dot{width:7px;height:7px;border-radius:50%;background:var(--mid);transition:background .3s;flex-shrink:0}
+.sync-pill.live .dot{background:#4ade80;box-shadow:0 0 5px #4ade8066}
+.sync-pill.live{color:#4ade80;border-color:rgba(74,222,128,0.25)}
+.sync-pill.saving .dot{background:var(--amber);animation:pulse 1s infinite}
+.sync-pill.error .dot{background:var(--red)}
+.sync-pill.error{color:var(--red);border-color:rgba(200,55,45,0.3)}
+.sync-pill.offline .dot{background:var(--steel)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+.hbtn{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.05em;text-transform:uppercase;padding:7px 12px;border-radius:3px;cursor:pointer;border:1.5px solid;transition:all .15s;white-space:nowrap;line-height:1}
+.hbtn-count{font-family:'DM Mono',monospace;font-size:10px;color:var(--mid);letter-spacing:0.05em;border:1px solid rgba(255,255,255,0.12);padding:5px 10px;border-radius:3px}
+.btn-add{color:#fff;border-color:var(--red);background:var(--red)}
+.btn-add:hover{background:#a82820}
+.btn-bulk{color:var(--amber);border-color:var(--amber);background:none}
+.btn-bulk:hover{background:var(--amber);color:#fff}
+.btn-ghost{color:var(--mid);border-color:rgba(255,255,255,0.15);background:none}
+.btn-ghost:hover{color:#fff;border-color:#fff}
+.btn-setup-hdr{color:var(--mid);border-color:rgba(255,255,255,0.15);background:none}
+.btn-setup-hdr:hover{color:#fff;border-color:#fff}
+
+/* LAYOUT */
+.layout{display:grid;grid-template-columns:260px 1fr;min-height:calc(100vh - 63px)}
+
+/* SIDEBAR */
+.sidebar{background:var(--cream);border-right:1px solid var(--border);padding:20px 16px;display:flex;flex-direction:column;gap:18px;overflow-y:auto;max-height:calc(100vh - 63px);position:sticky;top:63px}
+.fg label{display:block;font-family:'Syne',sans-serif;font-weight:700;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--steel);margin-bottom:7px}
+.chip-group{display:flex;flex-wrap:wrap;gap:5px}
+.chip{font-family:'DM Mono',monospace;font-size:11px;padding:4px 8px;border-radius:3px;border:1.5px solid var(--border);background:var(--paper);color:var(--steel);cursor:pointer;transition:all .12s;user-select:none}
+.chip:hover{border-color:var(--ink);color:var(--ink)}
+.chip.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.chip.all.on{background:var(--red);border-color:var(--red)}
+.div{height:1px;background:var(--border)}
+.clr-btn{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.05em;text-transform:uppercase;color:var(--red);background:none;border:1.5px solid var(--red);border-radius:3px;padding:7px;cursor:pointer;width:100%;transition:all .15s}
+.clr-btn:hover{background:var(--red);color:#fff}
+.sw{position:relative}
+.sw input{width:100%;font-family:'DM Mono',monospace;font-size:12px;padding:8px 10px 8px 29px;border:1.5px solid var(--border);border-radius:3px;background:var(--paper);color:var(--ink);outline:none;transition:border-color .15s}
+.sw input:focus{border-color:var(--ink)}
+.sw::before{content:'⌕';position:absolute;left:8px;top:50%;transform:translateY(-50%);color:var(--steel);font-size:15px;pointer-events:none}
+
+/* MAIN */
+.main{display:flex;flex-direction:column}
+.rbar{padding:10px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;background:var(--paper);flex-wrap:wrap}
+.rcount{font-family:'Syne',sans-serif;font-weight:700;font-size:13px;white-space:nowrap}
+.rcount span{font-family:'DM Mono',monospace;font-size:18px;color:var(--red);margin-right:3px}
+.pills{display:flex;gap:5px;flex-wrap:wrap;flex:1;min-width:0}
+.pill{font-family:'DM Mono',monospace;font-size:10px;padding:3px 7px;background:var(--ink);color:#fff;border-radius:2px}
+.exp-group{display:flex;gap:6px;margin-left:auto}
+.ebtn{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.04em;text-transform:uppercase;border-radius:3px;padding:6px 11px;cursor:pointer;border:1.5px solid;transition:all .15s;white-space:nowrap}
+.btn-csv{color:var(--green);border-color:var(--green);background:var(--green-bg)}
+.btn-csv:hover{background:var(--green);color:#fff}
+.btn-cp{color:var(--blue);border-color:var(--blue);background:var(--blue-bg)}
+.btn-cp:hover{background:var(--blue);color:#fff}
+
+/* TABLE */
+.tw{flex:1;overflow:auto;padding:16px 24px 40px}
+table{width:100%;border-collapse:collapse}
+thead th{font-family:'Syne',sans-serif;font-weight:700;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--steel);text-align:left;padding:8px 10px;border-bottom:2px solid var(--ink);white-space:nowrap}
+tbody tr{border-bottom:1px solid var(--border);transition:background .1s}
+tbody tr:hover{background:var(--cream)}
+tbody td{padding:10px 10px;font-size:13px;vertical-align:middle}
+td.n{font-weight:500}
+td.em{font-family:'DM Mono',monospace;font-size:11px;color:var(--blue);word-break:break-all}
+td.nt{font-size:12px;color:var(--steel)}
+.tag{display:inline-block;font-family:'DM Mono',monospace;font-size:10px;padding:2px 6px;border-radius:2px;white-space:nowrap}
+.ts{background:var(--blue-bg);color:var(--blue);border:1px solid rgba(26,75,173,0.18)}
+.tc{background:var(--amber-bg);color:var(--amber);border:1px solid rgba(196,123,26,0.18)}
+.tt{background:var(--green-bg);color:var(--green);border:1px solid rgba(30,122,76,0.18)}
+.act-btns{display:flex;gap:5px;opacity:0;transition:opacity .15s}
+tbody tr:hover .act-btns{opacity:1}
+.act-btn{font-family:'DM Mono',monospace;font-size:10px;padding:3px 7px;border-radius:2px;cursor:pointer;border:1px solid;transition:all .12s;background:none}
+.btn-edit{color:var(--blue);border-color:var(--blue)}
+.btn-edit:hover{background:var(--blue);color:#fff}
+.btn-del{color:var(--red);border-color:var(--red)}
+.btn-del:hover{background:var(--red);color:#fff}
+
+/* EMPTY */
+.empty{display:none;flex-direction:column;align-items:center;justify-content:center;padding:70px 40px;text-align:center;gap:12px}
+.empty.on{display:flex}
+.ei{font-size:36px;opacity:.3}
+.empty h3{font-family:'Syne',sans-serif;font-weight:700;font-size:15px}
+.empty p{font-size:13px;color:var(--steel);max-width:290px;line-height:1.6}
+
+/* MODAL BASE */
+.mb{position:fixed;inset:0;background:rgba(10,10,15,0.6);display:flex;align-items:center;justify-content:center;z-index:200;opacity:0;pointer-events:none;transition:opacity .2s;backdrop-filter:blur(2px)}
+.mb.on{opacity:1;pointer-events:all}
+.md{background:var(--paper);border-radius:6px;width:540px;max-width:96vw;max-height:92vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,0.3)}
+.md-lg{width:680px}
+.md-xl{width:620px}
+.mh{background:var(--ink);padding:18px 22px;display:flex;align-items:center;justify-content:space-between;border-radius:6px 6px 0 0;position:sticky;top:0;z-index:2}
+.mh h2{font-family:'Syne',sans-serif;font-weight:800;font-size:14px;color:#fff}
+.mc{background:none;border:none;color:var(--mid);font-size:20px;cursor:pointer;transition:color .15s;line-height:1}
+.mc:hover{color:#fff}
+.mb-body{padding:22px;display:flex;flex-direction:column;gap:14px}
+
+/* FORM */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-grid .full{grid-column:1/-1}
+.field label{display:block;font-family:'Syne',sans-serif;font-weight:700;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--steel);margin-bottom:5px}
+.field input,.field select,.field textarea{width:100%;font-family:'DM Mono',monospace;font-size:12px;padding:8px 10px;border:1.5px solid var(--border);border-radius:3px;background:#fff;color:var(--ink);outline:none;transition:border-color .15s;-webkit-appearance:none}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--blue)}
+.field textarea{resize:vertical;min-height:60px;font-family:'DM Sans',sans-serif;font-size:13px}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;padding-top:4px}
+.btn-primary{font-family:'DM Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.05em;background:var(--ink);color:#fff;border:none;border-radius:3px;padding:9px 16px;cursor:pointer;transition:background .15s}
+.btn-primary:hover{background:#222}
+.btn-secondary{font-family:'DM Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.05em;background:none;color:var(--steel);border:1.5px solid var(--border);border-radius:3px;padding:9px 12px;cursor:pointer;transition:all .15s}
+.btn-secondary:hover{border-color:var(--ink);color:var(--ink)}
+.btn-danger{font-family:'DM Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.05em;background:var(--red);color:#fff;border:none;border-radius:3px;padding:9px 12px;cursor:pointer;transition:background .15s;margin-right:auto}
+.btn-danger:hover{background:#a82820}
+
+/* BULK */
+.bulk-info{background:var(--blue-bg);border-radius:4px;padding:13px;font-size:12.5px;color:var(--steel);line-height:1.65}
+.bulk-info code{font-family:'DM Mono',monospace;font-size:11px;background:rgba(26,75,173,0.1);padding:2px 5px;border-radius:2px;color:var(--blue)}
+.bulk-ta{width:100%;font-family:'DM Mono',monospace;font-size:12px;padding:11px;border:1.5px solid var(--border);border-radius:3px;background:#fff;color:var(--ink);outline:none;resize:vertical;min-height:180px;line-height:1.7;transition:border-color .15s}
+.bulk-ta:focus{border-color:var(--blue)}
+.preview-label{font-family:'DM Mono',monospace;font-size:11px;color:var(--steel);margin-bottom:7px;letter-spacing:0.04em}
+.preview-table{width:100%;border-collapse:collapse;font-size:12px;max-height:160px;display:block;overflow-y:auto}
+.preview-table th{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--steel);padding:5px 9px;border-bottom:1.5px solid var(--ink);text-align:left;background:var(--cream);position:sticky;top:0}
+.preview-table td{padding:5px 9px;border-bottom:1px solid var(--border);color:var(--ink)}
+.preview-err{color:var(--red);font-family:'DM Mono',monospace;font-size:11px;margin-top:5px}
+.preview-ok{color:var(--green);font-family:'DM Mono',monospace;font-size:11px;margin-top:5px}
+
+/* SETUP MODAL */
+.step{display:flex;gap:13px;align-items:flex-start}
+.step-num{width:24px;height:24px;border-radius:50%;background:var(--ink);color:#fff;font-family:'Syne',sans-serif;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.step-content h4{font-family:'Syne',sans-serif;font-weight:700;font-size:13px;margin-bottom:5px}
+.step-content p{font-size:12.5px;color:var(--steel);line-height:1.65}
+code{font-family:'DM Mono',monospace;font-size:11px;background:var(--cream);padding:2px 5px;border-radius:2px;color:var(--ink)}
+.key-wrap{display:flex;gap:7px;margin-top:9px}
+.key-wrap input{flex:1;font-family:'DM Mono',monospace;font-size:12px;padding:9px 10px;border:1.5px solid var(--border);border-radius:3px;outline:none;background:#fff;transition:border-color .15s}
+.key-wrap input:focus{border-color:var(--blue)}
+.key-wrap input[type=password]{letter-spacing:0.1em}
+.btn-connect{font-family:'DM Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.05em;background:var(--blue);color:#fff;border:none;border-radius:3px;padding:9px 14px;cursor:pointer;white-space:nowrap;transition:background .15s}
+.btn-connect:hover{background:#0f3485}
+.conn-status{font-family:'DM Mono',monospace;font-size:11px;margin-top:7px}
+.conn-status.ok{color:var(--green)}
+.conn-status.err{color:var(--red)}
+.setup-note{background:var(--amber-bg);border-radius:4px;padding:12px 14px;font-size:12px;color:var(--amber);line-height:1.6;border-left:3px solid var(--amber)}
+
+/* TOAST */
+.toast{position:fixed;bottom:20px;right:20px;background:var(--ink);color:#fff;font-family:'DM Mono',monospace;font-size:12px;padding:10px 15px;border-radius:4px;opacity:0;transform:translateY(8px);transition:all .2s;pointer-events:none;z-index:500;max-width:340px;line-height:1.5}
+.toast.on{opacity:1;transform:translateY(0)}
+.toast.s{border-left:3px solid #4ade80}
+.toast.e{border-left:3px solid var(--red)}
+.toast.w{border-left:3px solid var(--amber)}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>FIREBLOCKS PR</h1>
+  <span class="sub">Media List</span>
+  <div class="hdr-right">
+    <div class="sync-pill offline" id="syncPill">
+      <span class="dot"></span>
+      <span id="syncLabel">Not connected</span>
+    </div>
+    <span class="hbtn-count" id="totalBadge">0 reporters</span>
+    <button class="hbtn btn-bulk"       onclick="openBulk()">⊞ Bulk Add</button>
+    <button class="hbtn btn-add"        onclick="openAdd()">+ Add Reporter</button>
+    <button class="hbtn btn-ghost"      onclick="exportAll()">↓ Backup</button>
+    <button class="hbtn btn-setup-hdr"  onclick="openSetup()">⚙</button>
+  </div>
+</header>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="fg"><label>Search</label><div class="sw"><input type="text" id="searchInput" placeholder="name, outlet, email…"></div></div>
+    <div class="div"></div>
+    <div class="fg"><label>Sector</label><div class="chip-group" id="sectorChips"></div></div>
+    <div class="fg"><label>Country</label><div class="chip-group" id="countryChips"></div></div>
+    <div class="fg"><label>Outlet Type</label><div class="chip-group" id="typeChips"></div></div>
+    <div class="div"></div>
+    <button class="clr-btn" onclick="clearAll()">↺ Clear filters</button>
+  </aside>
+
+  <div class="main">
+    <div class="rbar">
+      <div class="rcount"><span id="matchCount">—</span> reporters</div>
+      <div class="pills" id="activePills"></div>
+      <div class="exp-group">
+        <button class="ebtn btn-csv" onclick="exportCSV()">↓ CSV</button>
+        <button class="ebtn btn-cp"  onclick="copyForSheets()">⎘ Copy for Sheets</button>
+      </div>
+    </div>
+    <div class="tw">
+      <div class="empty on" id="emptyState">
+        <div class="ei">◎</div>
+        <h3 id="emptyTitle">Not connected yet</h3>
+        <p id="emptyMsg">Click ⚙ in the top right to connect your shared database. Takes 3 minutes to set up.</p>
+      </div>
+      <table id="tbl" style="display:none">
+        <thead><tr>
+          <th>Reporter</th><th>Email</th><th>Outlet</th>
+          <th>Sector</th><th>Country</th><th>Type</th><th>Notes</th><th></th>
+        </tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ ADD / EDIT MODAL ═══ -->
+<div class="mb" id="addModal">
+  <div class="md">
+    <div class="mh"><h2 id="addModalTitle">+ Add Reporter</h2><button class="mc" onclick="closeAdd()">✕</button></div>
+    <div class="mb-body">
+      <div class="form-grid">
+        <div class="field"><label>Name *</label><input id="f-name" type="text" placeholder="James Walker"></div>
+        <div class="field"><label>Email *</label><input id="f-email" type="email" placeholder="j.walker@ft.com"></div>
+        <div class="field"><label>Outlet</label><input id="f-outlet" type="text" placeholder="Financial Times"></div>
+        <div class="field"><label>Sector</label>
+          <select id="f-sector"><option value="">— select —</option><option>AI</option><option>Business</option><option>Markets</option><option>Finance</option><option>Crypto</option><option>Mainstream</option><option>Technology</option></select>
+        </div>
+        <div class="field"><label>Country</label>
+          <select id="f-country"><option value="">— select —</option><option>UK</option><option>UAE</option><option>France</option><option>Germany</option><option>Switzerland</option><option>South Korea</option><option>Singapore</option><option>Hong Kong</option><option>Thailand</option><option>Japan</option><option>US</option><option>Other</option></select>
+        </div>
+        <div class="field"><label>Outlet Type</label>
+          <select id="f-type"><option value="">— select —</option><option>Publication</option><option>Podcast</option><option>Broadcast</option><option>Magazine</option></select>
+        </div>
+        <div class="field full"><label>Notes</label><textarea id="f-notes" placeholder="e.g. Senior fintech reporter, covers DeFi…"></textarea></div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-danger" id="deleteBtn" onclick="deleteReporter()" style="display:none">Delete</button>
+        <button class="btn-secondary" onclick="closeAdd()">Cancel</button>
+        <button class="btn-primary" onclick="saveReporter()">Save Reporter</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ BULK ADD MODAL ═══ -->
+<div class="mb" id="bulkModal">
+  <div class="md md-lg">
+    <div class="mh"><h2>⊞ Bulk Add Reporters</h2><button class="mc" onclick="closeBulk()">✕</button></div>
+    <div class="mb-body">
+      <div class="bulk-info">
+        Paste your list below — one reporter per line.<br>
+        Column order: <code>Name</code> · <code>Email</code> · <code>Outlet</code> · <code>Sector</code> · <code>Country</code> · <code>Type</code> · <code>Notes</code><br>
+        <strong>Tip:</strong> Copy rows straight from Google Sheets or Excel and paste — tabs are handled automatically. Only Name and Email are required.
+      </div>
+      <div class="field">
+        <label>Paste your list here</label>
+        <textarea class="bulk-ta" id="bulkInput" placeholder="James Walker&#9;j.walker@ft.com&#9;Financial Times&#9;Finance&#9;UK&#9;Publication&#9;Senior fintech&#10;Sarah Chen&#9;s.chen@bloomberg.com&#9;Bloomberg&#9;Markets&#9;UAE&#9;Publication" oninput="parseBulk()"></textarea>
+      </div>
+      <div id="bulkPreview"></div>
+      <div class="modal-actions">
+        <button class="btn-secondary" onclick="closeBulk()">Cancel</button>
+        <button class="btn-primary" id="bulkSaveBtn" onclick="saveBulk()" disabled>Import 0 Reporters</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SETUP MODAL ═══ -->
+<div class="mb" id="setupModal">
+  <div class="md md-xl">
+    <div class="mh"><h2>⚙ &nbsp;Connect Shared Database</h2><button class="mc" onclick="closeSetup()">✕</button></div>
+    <div class="mb-body">
+
+      <div class="setup-note">
+        This connects all team members to the same live reporter list. One person sets it up once — everyone else just needs the API key pasted in.
+      </div>
+
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h4>Create a free JSONBin account</h4>
+          <p>Go to <strong>jsonbin.io</strong> → click <strong>Sign Up</strong> → use a team email (e.g. your agency Google account) so anyone can log in if needed.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h4>Get your API key</h4>
+          <p>After signing in, click your profile icon → <strong>API Keys</strong> → copy the <strong>Master Key</strong> (starts with <code>$2b$</code>…). This is the only key you'll ever need.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h4>Paste your Master Key below</h4>
+          <p>The app will create a private bin automatically and store the database there. Share the key with teammates so they can paste it into their own copy of the app.</p>
+          <div class="key-wrap">
+            <input type="password" id="apiKeyInput" placeholder="$2b$10$…paste your JSONBin master key…" autocomplete="off">
+            <button class="btn-connect" onclick="connectDB()">Connect</button>
+          </div>
+          <div class="conn-status" id="connStatus"></div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <h4>Share with your team</h4>
+          <p>Once connected, share two things with teammates: the hosted URL of this app (e.g. your GitHub Pages URL) and the JSONBin Master Key. They paste the key once and are instantly on the same live list.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════════════════════
+const JSONBIN_BASE = 'https://api.jsonbin.io/v3';
+const LOCAL_KEY    = 'fb_pr_v3';           // localStorage key for creds
+const CACHE_KEY    = 'fb_pr_cache_v3';     // localStorage key for data cache
+
+// ═══════════════════════════════════════════════════════
+// CREDENTIAL STORAGE
+// ═══════════════════════════════════════════════════════
+function getCreds(){ try{ return JSON.parse(localStorage.getItem(LOCAL_KEY))||{}; }catch{ return {}; } }
+function saveCreds(obj){ localStorage.setItem(LOCAL_KEY, JSON.stringify(obj)); }
+function getCache(){ try{ return JSON.parse(localStorage.getItem(CACHE_KEY))||[]; }catch{ return []; } }
+function saveCache(d){ localStorage.setItem(CACHE_KEY, JSON.stringify(d)); }
+
+// ═══════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════
+let DB = [];
+let isSaving = false;
+const F = {sectors:new Set(), countries:new Set(), types:new Set(), search:''};
+let editingId = null;
+let bulkParsed = [];
+
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
+
+// ═══════════════════════════════════════════════════════
+// JSONBIN API
+// ═══════════════════════════════════════════════════════
+async function apiGet(path, key){
+  const r = await fetch(JSONBIN_BASE+path, {headers:{'X-Master-Key':key}});
+  if(!r.ok) throw new Error(`${r.status} ${r.statusText}`);
+  return r.json();
+}
+async function apiPost(path, key, body){
+  const r = await fetch(JSONBIN_BASE+path, {
+    method:'POST', headers:{'X-Master-Key':key,'Content-Type':'application/json'},
+    body: JSON.stringify(body)
+  });
+  if(!r.ok) throw new Error(`${r.status} ${r.statusText}`);
+  return r.json();
+}
+async function apiPut(path, key, body){
+  const r = await fetch(JSONBIN_BASE+path, {
+    method:'PUT', headers:{'X-Master-Key':key,'Content-Type':'application/json'},
+    body: JSON.stringify(body)
+  });
+  if(!r.ok) throw new Error(`${r.status} ${r.statusText}`);
+  return r.json();
+}
+
+// ═══════════════════════════════════════════════════════
+// CONNECT — called from setup modal
+// ═══════════════════════════════════════════════════════
+async function connectDB(){
+  const key = document.getElementById('apiKeyInput').value.trim();
+  if(!key){ setConnStatus('Please paste your Master Key','err'); return; }
+
+  setConnStatus('Connecting…','');
+  setSyncPill('saving','Connecting…');
+
+  try {
+    const creds = getCreds();
+
+    // If we already have a bin ID stored with this key, just verify it works
+    if(creds.binId && creds.apiKey === key){
+      const data = await apiGet(`/b/${creds.binId}/latest`, key);
+      DB = data.record.reporters || [];
+      saveCache(DB);
+      setConnStatus(`✓ Reconnected — ${DB.length} reporters loaded`, 'ok');
+      finishConnect(key, creds.binId);
+      return;
+    }
+
+    // Otherwise create a new bin
+    const res = await apiPost('/b', key, {
+      reporters: SEED_DATA,
+      meta: { app:'fb_pr_media_list', created: new Date().toISOString() }
+    });
+    const binId = res.metadata.id;
+    DB = SEED_DATA;
+    saveCache(DB);
+    saveCreds({ apiKey: key, binId });
+    setConnStatus(`✓ Database created — ${DB.length} reporters loaded`, 'ok');
+    finishConnect(key, binId);
+
+  } catch(err){
+    setConnStatus(`✗ ${err.message} — check your key and try again`, 'err');
+    setSyncPill('error', 'Connection failed');
+  }
+}
+
+function finishConnect(key, binId){
+  saveCreds({ apiKey: key, binId });
+  closeSetup();
+  setSyncPill('live', `Live · ${DB.length} reporters`);
+  buildAllChips(); render();
+  toast(`Connected — ${DB.length} reporters loaded`, 's');
+}
+
+function setConnStatus(msg, cls){
+  const el = document.getElementById('connStatus');
+  el.textContent = msg; el.className = 'conn-status ' + cls;
+}
+
+// ═══════════════════════════════════════════════════════
+// LOAD ON BOOT
+// ═══════════════════════════════════════════════════════
+async function bootLoad(){
+  const creds = getCreds();
+  if(!creds.apiKey || !creds.binId){
+    // Show cached data if any, but mark offline
+    const cached = getCache();
+    if(cached.length){
+      DB = cached;
+      setSyncPill('offline','Offline — cached data');
+      buildAllChips(); render();
+      toast('Showing cached data — open ⚙ to reconnect','w');
+    } else {
+      setSyncPill('offline','Not connected');
+      render();
+    }
+    return;
+  }
+
+  // Show cached immediately, then refresh from server
+  const cached = getCache();
+  if(cached.length){
+    DB = cached;
+    setSyncPill('saving','Syncing…');
+    buildAllChips(); render();
+  }
+
+  try {
+    const data = await apiGet(`/b/${creds.binId}/latest`, creds.apiKey);
+    DB = data.record.reporters || [];
+    saveCache(DB);
+    setSyncPill('live', `Live · ${DB.length} reporters`);
+    buildAllChips(); render();
+  } catch(err){
+    if(cached.length){
+      setSyncPill('offline','Offline — cached data');
+      toast('Could not reach server — showing last cached data','w');
+    } else {
+      setSyncPill('error','Connection error');
+      toast('Connection failed — open ⚙ to reconnect','e');
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// SAVE TO JSONBIN (debounced)
+// ═══════════════════════════════════════════════════════
+let saveTimer;
+function scheduleSave(){
+  saveCache(DB); // always save locally immediately
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(pushToServer, 800);
+}
+
+async function pushToServer(){
+  const creds = getCreds();
+  if(!creds.apiKey || !creds.binId) return;
+  isSaving = true;
+  setSyncPill('saving','Saving…');
+  try {
+    await apiPut(`/b/${creds.binId}`, creds.apiKey, { reporters: DB });
+    setSyncPill('live', `Live · ${DB.length} reporters`);
+  } catch(err){
+    setSyncPill('error','Save failed');
+    toast('Could not save — check your connection','e');
+  }
+  isSaving = false;
+}
+
+// ═══════════════════════════════════════════════════════
+// SYNC PILL
+// ═══════════════════════════════════════════════════════
+function setSyncPill(cls, label){
+  const el = document.getElementById('syncPill');
+  el.className = 'sync-pill ' + cls;
+  document.getElementById('syncLabel').textContent = label;
+}
+
+// ═══════════════════════════════════════════════════════
+// CHIPS / FILTERS
+// ═══════════════════════════════════════════════════════
+function uniq(key){ return [...new Set(DB.map(r=>r[key]).filter(Boolean))].sort(); }
+
+function buildAllChips(){
+  buildChips('sectorChips',  uniq('sector'),  F.sectors);
+  buildChips('countryChips', uniq('country'), F.countries);
+  buildChips('typeChips',    uniq('type'),    F.types);
+}
+
+function buildChips(id, vals, set){
+  const el = document.getElementById(id); el.innerHTML = '';
+  const a = mkChip('All','__all__',true);
+  a.onclick = ()=>{ set.clear(); syncC(el,set); render(); };
+  el.appendChild(a);
+  vals.forEach(v=>{
+    const c = mkChip(v,v,false);
+    c.onclick = ()=>{ set.has(v)?set.delete(v):set.add(v); syncC(el,set); render(); };
+    el.appendChild(c);
+  });
+}
+function mkChip(label,val,isAll){
+  const d = document.createElement('div');
+  d.className = 'chip' + (isAll?' all on':'');
+  d.textContent = label; d.dataset.v = val; return d;
+}
+function syncC(el, set){
+  el.querySelectorAll('.chip').forEach(c=>{
+    c.dataset.v==='__all__'
+      ? c.classList.toggle('on', set.size===0)
+      : c.classList.toggle('on', set.has(c.dataset.v));
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// FILTER + RENDER
+// ═══════════════════════════════════════════════════════
+function filtered(){
+  const q = F.search.toLowerCase();
+  return DB.filter(r=>{
+    if(F.sectors.size   && !F.sectors.has(r.sector))    return false;
+    if(F.countries.size && !F.countries.has(r.country)) return false;
+    if(F.types.size     && !F.types.has(r.type))        return false;
+    if(q && ![r.name,r.email,r.outlet,r.sector,r.country,r.type,r.notes]
+             .some(f=>f&&f.toLowerCase().includes(q)))   return false;
+    return true;
+  });
+}
+
+function render(){
+  const rows = filtered();
+  document.getElementById('matchCount').textContent = rows.length;
+  document.getElementById('totalBadge').textContent = DB.length + ' reporters';
+
+  const pills = document.getElementById('activePills'); pills.innerHTML = '';
+  [...F.sectors,...F.countries,...F.types].forEach(v=>{
+    const p=document.createElement('span'); p.className='pill'; p.textContent=v; pills.appendChild(p);
+  });
+  if(F.search){ const p=document.createElement('span'); p.className='pill'; p.textContent=`"${F.search}"`; pills.appendChild(p); }
+
+  const empty = document.getElementById('emptyState');
+  const tbl   = document.getElementById('tbl');
+
+  if(rows.length===0){
+    empty.classList.add('on'); tbl.style.display='none';
+    if(DB.length===0 && !getCreds().binId){
+      document.getElementById('emptyTitle').textContent = 'Not connected yet';
+      document.getElementById('emptyMsg').textContent   = 'Click ⚙ in the top right to connect your shared database.';
+    } else if(DB.length===0){
+      document.getElementById('emptyTitle').textContent = 'No reporters yet';
+      document.getElementById('emptyMsg').textContent   = 'Click + Add Reporter or ⊞ Bulk Add to get started.';
+    } else {
+      document.getElementById('emptyTitle').textContent = 'No reporters match';
+      document.getElementById('emptyMsg').textContent   = 'Try broadening your filters or clearing the search.';
+    }
+    return;
+  }
+  empty.classList.remove('on'); tbl.style.display = '';
+
+  document.getElementById('tbody').innerHTML = rows.map(r=>`<tr>
+    <td class="n">${x(r.name)}</td>
+    <td class="em">${x(r.email)}</td>
+    <td>${x(r.outlet)}</td>
+    <td>${r.sector  ?`<span class="tag ts">${x(r.sector)}</span>` :'—'}</td>
+    <td>${r.country ?`<span class="tag tc">${x(r.country)}</span>`:'—'}</td>
+    <td>${r.type    ?`<span class="tag tt">${x(r.type)}</span>`   :'—'}</td>
+    <td class="nt">${x(r.notes)}</td>
+    <td><div class="act-btns">
+      <button class="act-btn btn-edit" onclick="openEdit('${r.id}')">Edit</button>
+      <button class="act-btn btn-del"  onclick="confirmDel('${r.id}')">✕</button>
+    </div></td>
+  </tr>`).join('');
+}
+const x = s => s ? s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') : '';
+
+// ═══════════════════════════════════════════════════════
+// ADD / EDIT
+// ═══════════════════════════════════════════════════════
+function openAdd(){
+  editingId = null;
+  document.getElementById('addModalTitle').textContent = '+ Add Reporter';
+  document.getElementById('deleteBtn').style.display = 'none';
+  ['name','email','outlet','notes'].forEach(f=>document.getElementById('f-'+f).value='');
+  ['sector','country','type'].forEach(f=>document.getElementById('f-'+f).value='');
+  document.getElementById('addModal').classList.add('on');
+  setTimeout(()=>document.getElementById('f-name').focus(),80);
+}
+function openEdit(id){
+  const r = DB.find(d=>d.id===id); if(!r) return;
+  editingId = id;
+  document.getElementById('addModalTitle').textContent = 'Edit Reporter';
+  document.getElementById('deleteBtn').style.display = '';
+  document.getElementById('deleteBtn').dataset.id = id;
+  ['name','email','outlet','notes'].forEach(f=>document.getElementById('f-'+f).value=r[f]||'');
+  ['sector','country','type'].forEach(f=>document.getElementById('f-'+f).value=r[f]||'');
+  document.getElementById('addModal').classList.add('on');
+}
+function closeAdd(){ document.getElementById('addModal').classList.remove('on'); editingId=null; }
+
+function saveReporter(){
+  const name  = document.getElementById('f-name').value.trim();
+  const email = document.getElementById('f-email').value.trim();
+  if(!name||!email){ toast('Name and Email are required','e'); return; }
+  const obj = {
+    id: editingId||uid(), name, email,
+    outlet:  document.getElementById('f-outlet').value.trim(),
+    sector:  document.getElementById('f-sector').value,
+    country: document.getElementById('f-country').value,
+    type:    document.getElementById('f-type').value,
+    notes:   document.getElementById('f-notes').value.trim(),
+  };
+  if(editingId){ const i=DB.findIndex(r=>r.id===editingId); DB[i]=obj; }
+  else DB.push(obj);
+  scheduleSave(); closeAdd(); buildAllChips(); render();
+  toast(editingId?`Updated ${name}`:`Added ${name}`,'s');
+}
+
+function confirmDel(id){
+  const r = DB.find(d=>d.id===id); if(!r) return;
+  if(confirm(`Delete ${r.name}? This cannot be undone.`)){ DB=DB.filter(d=>d.id!==id); scheduleSave(); closeAdd(); buildAllChips(); render(); toast('Reporter deleted','w'); }
+}
+function deleteReporter(){ confirmDel(document.getElementById('deleteBtn').dataset.id); }
+
+// ═══════════════════════════════════════════════════════
+// BULK ADD
+// ═══════════════════════════════════════════════════════
+function openBulk(){
+  document.getElementById('bulkInput').value='';
+  document.getElementById('bulkPreview').innerHTML='';
+  document.getElementById('bulkSaveBtn').disabled=true;
+  document.getElementById('bulkSaveBtn').textContent='Import 0 Reporters';
+  bulkParsed=[];
+  document.getElementById('bulkModal').classList.add('on');
+  setTimeout(()=>document.getElementById('bulkInput').focus(),80);
+}
+function closeBulk(){ document.getElementById('bulkModal').classList.remove('on'); }
+
+function parseBulk(){
+  const raw = document.getElementById('bulkInput').value;
+  const lines = raw.split('\n').map(l=>l.trim()).filter(l=>l);
+  bulkParsed = []; const errs = [];
+  lines.forEach((line,i)=>{
+    const cols = line.includes('\t') ? line.split('\t') : line.split(',');
+    const [name,email,outlet,sector,country,type,...rest] = cols.map(c=>c.trim().replace(/^"|"$/g,'').trim());
+    const notes = rest.join(',').trim().replace(/^"|"$/g,'').trim();
+    if(!name){ errs.push(`Row ${i+1}: missing name`); return; }
+    if(!email||!email.includes('@')){ errs.push(`Row ${i+1}: invalid email for "${name}"`); return; }
+    bulkParsed.push({id:uid(),name,email,outlet:outlet||'',sector:sector||'',country:country||'',type:type||'',notes:notes||''});
+  });
+  const prev = document.getElementById('bulkPreview');
+  const btn  = document.getElementById('bulkSaveBtn');
+  if(!lines.length){ prev.innerHTML=''; btn.disabled=true; btn.textContent='Import 0 Reporters'; return; }
+  let html='';
+  if(errs.length) html+=`<div class="preview-err">⚠ ${errs.join(' · ')}</div>`;
+  if(bulkParsed.length){
+    html+=`<div class="preview-ok" style="margin-bottom:7px">✓ ${bulkParsed.length} reporters ready to import</div>`;
+    html+=`<table class="preview-table"><thead><tr><th>Name</th><th>Email</th><th>Outlet</th><th>Sector</th><th>Country</th><th>Type</th></tr></thead><tbody>`;
+    html+=bulkParsed.slice(0,6).map(r=>`<tr><td>${x(r.name)}</td><td>${x(r.email)}</td><td>${x(r.outlet)}</td><td>${x(r.sector)}</td><td>${x(r.country)}</td><td>${x(r.type)}</td></tr>`).join('');
+    if(bulkParsed.length>6) html+=`<tr><td colspan="6" style="color:var(--steel);font-size:11px;padding:6px 9px">…and ${bulkParsed.length-6} more</td></tr>`;
+    html+=`</tbody></table>`;
+    btn.disabled=false; btn.textContent=`Import ${bulkParsed.length} Reporter${bulkParsed.length!==1?'s':''}`;
+  } else { btn.disabled=true; btn.textContent='Import 0 Reporters'; }
+  prev.innerHTML=html;
+}
+
+function saveBulk(){
+  if(!bulkParsed.length) return;
+  const fresh = bulkParsed.filter(r=>!DB.some(d=>d.email.toLowerCase()===r.email.toLowerCase()));
+  const dupes  = bulkParsed.length - fresh.length;
+  DB.push(...fresh); scheduleSave(); closeBulk(); buildAllChips(); render();
+  let msg=`Added ${fresh.length} reporters`;
+  if(dupes) msg+=` · Skipped ${dupes} duplicate${dupes>1?'s':''}`;
+  toast(msg,'s');
+}
+
+// ═══════════════════════════════════════════════════════
+// EXPORT
+// ═══════════════════════════════════════════════════════
+function exportCSV(){
+  const rows = filtered();
+  if(!rows.length){ toast('No reporters to export','e'); return; }
+  const h = ['Name','Email','Outlet','Sector','Country','Type','Notes'];
+  const csv=[h,...rows.map(r=>[r.name,r.email,r.outlet,r.sector,r.country,r.type,r.notes])]
+    .map(row=>row.map(v=>`"${(v||'').replace(/"/g,'""')}"`).join(',')).join('\n');
+  dl(csv,'text/csv',`media_list_${today()}.csv`);
+  toast(`Exported ${rows.length} reporters`,'s');
+}
+function exportAll(){
+  const h = ['Name','Email','Outlet','Sector','Country','Type','Notes'];
+  const csv=[h,...DB.map(r=>[r.name,r.email,r.outlet,r.sector,r.country,r.type,r.notes])]
+    .map(row=>row.map(v=>`"${(v||'').replace(/"/g,'""')}"`).join(',')).join('\n');
+  dl(csv,'text/csv',`media_list_BACKUP_${today()}.csv`);
+  toast(`Full backup — ${DB.length} reporters`,'s');
+}
+function copyForSheets(){
+  const rows = filtered();
+  if(!rows.length){ toast('No reporters to copy','e'); return; }
+  const h = ['Name','Email','Outlet','Sector','Country','Type','Notes'];
+  const tsv=[h,...rows.map(r=>[r.name,r.email,r.outlet,r.sector,r.country,r.type,r.notes])]
+    .map(row=>row.map(v=>v||'').join('\t')).join('\n');
+  navigator.clipboard.writeText(tsv)
+    .then(()=>toast(`${rows.length} reporters copied — paste into Google Sheets with Ctrl+V / ⌘V`,'s'))
+    .catch(()=>{
+      const ta=document.createElement('textarea'); ta.value=tsv; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+      toast(`${rows.length} reporters copied`,'s');
+    });
+}
+function dl(content,type,name){
+  const a=Object.assign(document.createElement('a'),{href:URL.createObjectURL(new Blob([content],{type})),download:name}); a.click();
+}
+const today=()=>new Date().toISOString().slice(0,10);
+
+// ═══════════════════════════════════════════════════════
+// SETUP MODAL
+// ═══════════════════════════════════════════════════════
+function openSetup(){
+  const creds = getCreds();
+  if(creds.apiKey) document.getElementById('apiKeyInput').value = creds.apiKey;
+  document.getElementById('connStatus').textContent = '';
+  document.getElementById('setupModal').classList.add('on');
+}
+function closeSetup(){ document.getElementById('setupModal').classList.remove('on'); }
+
+// ═══════════════════════════════════════════════════════
+// CLOSE MODALS ON BACKGROUND CLICK
+// ═══════════════════════════════════════════════════════
+['addModal','bulkModal','setupModal'].forEach(id=>{
+  document.getElementById(id).addEventListener('click',e=>{
+    if(e.target===e.currentTarget){
+      if(id==='addModal') closeAdd();
+      else if(id==='bulkModal') closeBulk();
+      else closeSetup();
+    }
+  });
+});
+
+// ═══════════════════════════════════════════════════════
+// CLEAR / SEARCH
+// ═══════════════════════════════════════════════════════
+function clearAll(){
+  F.sectors.clear(); F.countries.clear(); F.types.clear(); F.search='';
+  document.getElementById('searchInput').value='';
+  ['sectorChips','countryChips','typeChips'].forEach(id=>{
+    const s=id==='sectorChips'?F.sectors:id==='countryChips'?F.countries:F.types;
+    syncC(document.getElementById(id),s);
+  });
+  render();
+}
+document.getElementById('searchInput').addEventListener('input',e=>{ F.search=e.target.value; render(); });
+
+// ═══════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════
+let tt;
+function toast(msg,type=''){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className=`toast on ${type}`;
+  clearTimeout(tt); tt=setTimeout(()=>t.classList.remove('on'),3800);
+}
+
+// ═══════════════════════════════════════════════════════
+// SEED DATA (loaded on first connect)
+// ═══════════════════════════════════════════════════════
+const SEED_DATA = [
+  {id:uid(),name:"James Walker",     email:"j.walker@ft.com",               outlet:"Financial Times",          sector:"Finance",    country:"UK",          type:"Publication",notes:"Senior fintech reporter"},
+  {id:uid(),name:"Sarah Chen",       email:"s.chen@bloomberg.com",          outlet:"Bloomberg",                sector:"Markets",    country:"UAE",         type:"Publication",notes:"Markets desk"},
+  {id:uid(),name:"Emma Thompson",    email:"e.thompson@bbc.co.uk",          outlet:"BBC",                      sector:"Mainstream", country:"UK",          type:"Broadcast",  notes:"Business reporter"},
+  {id:uid(),name:"Lucie Moreau",     email:"l.moreau@lesechos.fr",          outlet:"Les Echos",                sector:"Finance",    country:"France",      type:"Publication",notes:"Finance editor"},
+  {id:uid(),name:"Hans Mueller",     email:"h.mueller@handelsblatt.de",     outlet:"Handelsblatt",             sector:"Finance",    country:"Germany",     type:"Publication",notes:"FinTech desk"},
+  {id:uid(),name:"Sophie Müller",    email:"s.muller@nzz.ch",              outlet:"NZZ",                      sector:"Finance",    country:"Switzerland", type:"Publication",notes:"Swiss finance"},
+  {id:uid(),name:"Ahmed Al-Rashid",  email:"a.rashid@thenational.ae",       outlet:"The National",             sector:"Crypto",     country:"UAE",         type:"Publication",notes:"Crypto & DeFi"},
+  {id:uid(),name:"Fatima Al-Zahra",  email:"f.alzahra@arabianbusiness.com", outlet:"Arabian Business",         sector:"Finance",    country:"UAE",         type:"Magazine",   notes:"Finance & FS"},
+  {id:uid(),name:"Michael Torres",   email:"m.torres@reuters.com",          outlet:"Reuters",                  sector:"Markets",    country:"UK",          type:"Publication",notes:"FX & Crypto"},
+  {id:uid(),name:"Marc Dubois",      email:"m.dubois@coindesk.com",         outlet:"CoinDesk",                 sector:"Crypto",     country:"France",      type:"Publication",notes:"DeFi reporter"},
+  {id:uid(),name:"Yuki Tanaka",      email:"y.tanaka@cryptotimes.jp",       outlet:"Crypto Times",             sector:"Crypto",     country:"Japan",       type:"Publication",notes:"Digital assets"},
+  {id:uid(),name:"Min-jun Lee",      email:"mj.lee@koreaherald.com",        outlet:"Korea Herald",             sector:"Technology", country:"South Korea", type:"Publication",notes:"Fintech & crypto"},
+  {id:uid(),name:"Wei Lin",          email:"w.lin@straitstimes.com",        outlet:"The Straits Times",        sector:"Finance",    country:"Singapore",   type:"Publication",notes:"Finance & tech"},
+  {id:uid(),name:"Lisa Ho",          email:"l.ho@scmp.com",                 outlet:"South China Morning Post", sector:"Finance",    country:"Hong Kong",   type:"Publication",notes:"Crypto & DeFi"},
+  {id:uid(),name:"Haruto Sato",      email:"h.sato@nikkei.com",             outlet:"Nikkei",                   sector:"Finance",    country:"Japan",       type:"Publication",notes:"Finance desk"},
+  {id:uid(),name:"Nattaya Suksan",   email:"n.suksan@bangkokpost.com",       outlet:"Bangkok Post",             sector:"Business",   country:"Thailand",    type:"Publication",notes:"Fintech & finance"},
+  {id:uid(),name:"Kevin Chan",       email:"k.chan@hkfp.com",               outlet:"HKFP",                     sector:"Business",   country:"Hong Kong",   type:"Publication",notes:"Finance editor"},
+  {id:uid(),name:"Rajan Pillai",     email:"r.pillai@businesstimes.com.sg", outlet:"Business Times",           sector:"Markets",    country:"Singapore",   type:"Publication",notes:"Fintech reporter"},
+  {id:uid(),name:"Ji-yeon Kim",      email:"jy.kim@koreatimes.co.kr",       outlet:"Korea Times",              sector:"Business",   country:"South Korea", type:"Publication",notes:"Finance editor"},
+  {id:uid(),name:"Thomas Bauer",     email:"t.bauer@swissinfo.ch",          outlet:"SWI swissinfo",            sector:"Business",   country:"Switzerland", type:"Publication",notes:"Bilingual outlet"},
+  {id:uid(),name:"Clara Becker",     email:"c.becker@wirtschaftswoche.de",  outlet:"WirtschaftsWoche",         sector:"Business",   country:"Germany",     type:"Magazine",   notes:"Business mag"},
+  {id:uid(),name:"Isabelle Renard",  email:"i.renard@challenges.fr",        outlet:"Challenges",               sector:"Finance",    country:"France",      type:"Magazine",   notes:"Bi-weekly business"},
+  {id:uid(),name:"Alex Harrison",    email:"alex@blockchainpod.com",        outlet:"Blockchain Decoded",       sector:"Crypto",     country:"UK",          type:"Podcast",    notes:"~50K listeners"},
+  {id:uid(),name:"Priya Nair",       email:"priya@cryptoconvo.com",         outlet:"Crypto Conversations",     sector:"Crypto",     country:"UAE",         type:"Podcast",    notes:"DeFi focus"},
+  {id:uid(),name:"Jake Mercer",      email:"jake@fintechminutes.com",       outlet:"FinTech Minutes",          sector:"Finance",    country:"US",          type:"Podcast",    notes:"B2B audience"},
+  {id:uid(),name:"Lena Vogel",       email:"l.vogel@derstandard.at",        outlet:"Der Standard",             sector:"Technology", country:"Germany",     type:"Publication",notes:"Tech desk"},
+  {id:uid(),name:"Tom Simonite",     email:"t.simonite@wired.com",          outlet:"WIRED",                    sector:"AI",         country:"UK",          type:"Publication",notes:"AI correspondent"},
+  {id:uid(),name:"David Park",       email:"d.park@cnn.com",                outlet:"CNN",                      sector:"Mainstream", country:"UK",          type:"Broadcast",  notes:"Finance segment"},
+];
+
+// ═══════════════════════════════════════════════════════
+// BOOT
+// ═══════════════════════════════════════════════════════
+bootLoad();
+</script>
+</body>
+</html>
