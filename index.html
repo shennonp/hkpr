@@ -1314,7 +1314,8 @@ const KNOWN_TIERS    = ['tier 1','tier 2','tier 3'];
 const KNOWN_TYPES    = ['publication','podcast','broadcast','magazine','newsletter'];
 const KNOWN_BEATS_KW = ['funding','product','market','launch'];
 const KNOWN_COUNTRIES= ['france','germany','uk','uae','us','usa','singapore','japan','hong kong','south korea','switzerland','thailand','other'];
-const KNOWN_SECTORS  = ['ai','crypto','fintech','finance','business','technology','news','mainstream','markets'];
+// Sectors matched by inclusion so "Crypto Trade", "Crypto News" etc. all map to Crypto
+const KNOWN_SECTORS  = ['crypto','fintech','finance','business','technology','news','mainstream','markets','ai'];
 
 function sniffCol(val){
   const v=val.toLowerCase().trim();
@@ -1322,11 +1323,25 @@ function sniffCol(val){
   if(KNOWN_TIERS.some(t=>v===t)) return 'tier';
   if(KNOWN_TYPES.some(t=>v===t)) return 'type';
   if(KNOWN_BEATS_KW.some(k=>v.includes(k))) return 'beat';
-  if(KNOWN_COUNTRIES.some(c=>v===c)) return 'country';
-  if(KNOWN_SECTORS.some(s=>v===s)) return 'sector';
-  // themes: comma/semicolon separated list of known theme words
+  if(KNOWN_COUNTRIES.some(c=>v===c||v.startsWith(c+' ')||v.endsWith(' '+c))) return 'country';
+  // Sector: match by keyword inclusion so "Crypto Trade" -> crypto, "AI News" -> ai
+  if(KNOWN_SECTORS.some(s=>v.includes(s))) return 'sector';
+  // themes: comma/semicolon separated list
   if((v.includes(',') || v.includes(';')) && !v.includes('@')) return 'themes';
   return 'text';
+}
+
+// Normalise a sniffed sector value to the canonical chip label
+function normaliseSector(val){
+  const v=val.toLowerCase();
+  if(v.includes('crypto'))  return 'Crypto';
+  if(v.includes('fintech')) return 'Fintech';
+  if(v.includes('finance')) return 'Finance';
+  if(v.includes('tech'))    return 'Technology';
+  if(v.includes('news'))    return 'News';
+  if(v.includes('business'))return 'Business';
+  if(v.includes('ai'))      return 'AI';
+  return val; // fallback keep as-is
 }
 
 function parseBulk(){
@@ -1363,7 +1378,7 @@ function parseBulk(){
 
     bulkParsed.push({
       id:uid(), name, email:assigned.email, outlet,
-      tier:assigned.tier, beat:assigned.beat, sector:assigned.sector,
+      tier:assigned.tier, beat:assigned.beat, sector:assigned.sector?normaliseSector(assigned.sector):'',
       country:assigned.country, type:assigned.type,
       themes:assigned.themes.replace(/;/g,','), notes
     });
