@@ -398,6 +398,30 @@ code{font-family:'DM Mono',monospace;font-size:11px;background:var(--cream);padd
   </div>
 </div>
 
+
+<!-- ═══ BULK ADD CONFERENCES MODAL ═══ -->
+<div class="mb" id="confBulkModal">
+  <div class="md md-lg">
+    <div class="mh"><h2>⊞ Bulk Add Conferences</h2><button class="mc" onclick="closeConfBulk()">✕</button></div>
+    <div class="mb-body">
+      <div class="bulk-info">
+        Paste your list below — one event per line.<br>
+        Column order: <code>Event Name</code> · <code>Start Date</code> · <code>End Date</code> · <code>Audience</code> · <code>Themes</code> · <code>Organizer Contact</code> · <code>Notes</code><br>
+        <strong>Tip:</strong> Copy rows straight from Google Sheets or Excel. Dates as YYYY-MM-DD or DD/MM/YYYY. Only Event Name is required.
+      </div>
+      <div class="field">
+        <label>Paste your list here</label>
+        <textarea class="bulk-ta" id="confBulkInput" placeholder="Money 20/20&#9;2026-10-22&#9;2026-10-25&#9;Enterprises, Investors&#9;Fintech, AI&#9;contact@money2020.com&#9;Annual fintech conference" oninput="parseConfBulk()"></textarea>
+      </div>
+      <div id="confBulkPreview"></div>
+      <div class="modal-actions">
+        <button class="btn-secondary" onclick="closeConfBulk()">Cancel</button>
+        <button class="btn-primary" id="confBulkSaveBtn" onclick="saveConfBulk()" disabled>Import 0 Events</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ═══ SETUP MODAL ═══ -->
 <div class="mb" id="setupModal">
   <div class="md md-xl">
@@ -491,12 +515,16 @@ function switchTab(tab){
 
   if(tab==='reporters'){
     document.getElementById('bulkBtn').style.display='';
+    document.getElementById('bulkBtn').textContent='⊞ Bulk Add';
+    document.getElementById('bulkBtn').onclick=openBulk;
     document.getElementById('addBtn').textContent='+ Add Reporter';
     document.getElementById('addBtn').onclick=openAdd;
     document.getElementById('exportBtn').onclick=exportAll;
     document.getElementById('totalBadge').textContent=DB.reporters.length+' reporters';
   } else {
-    document.getElementById('bulkBtn').style.display='none';
+    document.getElementById('bulkBtn').style.display='';
+    document.getElementById('bulkBtn').textContent='⊞ Bulk Add';
+    document.getElementById('bulkBtn').onclick=openConfBulk;
     document.getElementById('addBtn').textContent='+ Add Conference';
     document.getElementById('addBtn').onclick=openConf;
     document.getElementById('exportBtn').onclick=exportConfAll;
@@ -622,6 +650,73 @@ function setConnStatus(msg,cls){
   el.textContent=msg; el.className='conn-status '+cls;
 }
 
+
+
+// ═══════════════════════════════════════════════════════
+// BULK ADD CONFERENCES
+// ═══════════════════════════════════════════════════════
+let confBulkParsed = [];
+
+function openConfBulk(){
+  document.getElementById('confBulkInput').value='';
+  document.getElementById('confBulkPreview').innerHTML='';
+  document.getElementById('confBulkSaveBtn').disabled=true;
+  document.getElementById('confBulkSaveBtn').textContent='Import 0 Events';
+  confBulkParsed=[];
+  document.getElementById('confBulkModal').classList.add('on');
+  setTimeout(()=>document.getElementById('confBulkInput').focus(),80);
+}
+function closeConfBulk(){ document.getElementById('confBulkModal').classList.remove('on'); }
+
+function parseConfDate(raw){
+  if(!raw) return '';
+  raw=raw.trim();
+  if(/^\d{4}-\d{2}-\d{2}$/.test(raw)) return raw;
+  const m=raw.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+  if(m) return `${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;
+  return raw;
+}
+
+function parseConfBulk(){
+  const raw=document.getElementById('confBulkInput').value;
+  const lines=raw.split('\n').map(l=>l.trim()).filter(l=>l);
+  confBulkParsed=[]; const errs=[];
+  lines.forEach((line,i)=>{
+    const cols=line.includes('\t')?line.split('\t'):line.split(',');
+    const [name,startRaw,endRaw,audience,themes,organizer,...rest]=cols.map(c=>c.trim().replace(/^"|"$/g,'').trim());
+    const notes=rest.join(',').trim().replace(/^"|"$/g,'').trim();
+    if(!name){ errs.push(`Row ${i+1}: missing event name`); return; }
+    const startDate=parseConfDate(startRaw);
+    const endDate=parseConfDate(endRaw);
+    const month=startDate?MONTHS[new Date(startDate+' ').getMonth()]:'';
+    confBulkParsed.push({id:uid(),name,startDate,endDate,month,audience:audience||'',themes:(themes||'').replace(/;/g,','),organizer:organizer||'',notes:notes||''});
+  });
+  const prev=document.getElementById('confBulkPreview');
+  const btn=document.getElementById('confBulkSaveBtn');
+  if(!lines.length){ prev.innerHTML=''; btn.disabled=true; btn.textContent='Import 0 Events'; return; }
+  let h='';
+  if(errs.length) h+=`<div class="preview-err">⚠ ${errs.join(' · ')}</div>`;
+  if(confBulkParsed.length){
+    h+=`<div class="preview-ok" style="margin-bottom:7px">✓ ${confBulkParsed.length} events ready to import</div>`;
+    h+=`<table class="preview-table"><thead><tr><th>Event Name</th><th>Start</th><th>End</th><th>Audience</th><th>Themes</th></tr></thead><tbody>`;
+    h+=confBulkParsed.slice(0,6).map(c=>`<tr><td>${x(c.name)}</td><td>${x(c.startDate)}</td><td>${x(c.endDate)}</td><td>${x(c.audience)}</td><td>${x(c.themes)}</td></tr>`).join('');
+    if(confBulkParsed.length>6) h+=`<tr><td colspan="5" style="color:var(--steel);font-size:11px;padding:6px 9px">…and ${confBulkParsed.length-6} more</td></tr>`;
+    h+=`</tbody></table>`;
+    btn.disabled=false; btn.textContent=`Import ${confBulkParsed.length} Event${confBulkParsed.length!==1?'s':''}`;
+  } else { btn.disabled=true; btn.textContent='Import 0 Events'; }
+  prev.innerHTML=h;
+}
+
+function saveConfBulk(){
+  if(!confBulkParsed.length) return;
+  const fresh=confBulkParsed.filter(c=>!DB.conferences.some(d=>d.name.toLowerCase()===c.name.toLowerCase()&&d.startDate===c.startDate));
+  const dupes=confBulkParsed.length-fresh.length;
+  DB.conferences.push(...fresh); scheduleSave(); closeConfBulk(); buildConfChips(); renderConf();
+  let msg=`Added ${fresh.length} event${fresh.length!==1?'s':''}`;
+  if(dupes) msg+=` · Skipped ${dupes} duplicate${dupes>1?'s':''}`;
+  toast(msg,'s');
+}
+
 // ═══════════════════════════════════════════════════════
 // BOOT
 // ═══════════════════════════════════════════════════════
@@ -741,12 +836,14 @@ function syncC(el,set){
 // CONFERENCE CHIPS / FILTERS
 // ═══════════════════════════════════════════════════════
 const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const CONF_AUDIENCES=['Developers','Enterprises','Investors','General Consumers'];
+const CONF_THEMES=['AI','Web3','Fintech','Crypto','Institutional'];
 
 function buildConfChips(){
   const usedMonths=[...new Set(DB.conferences.map(c=>c.month).filter(Boolean))].sort((a,b)=>MONTHS.indexOf(a)-MONTHS.indexOf(b));
-  buildConfChipSet('confMonthChips',   usedMonths,                              CF.months,    ()=>renderConf());
-  buildConfChipSet('confAudienceChips',uniq(DB.conferences,'audience'),         CF.audiences, ()=>renderConf());
-  buildConfChipSet('confThemeChips',   uniqTags(DB.conferences,'themes'),       CF.themes,    ()=>renderConf());
+  buildConfChipSet('confMonthChips',   usedMonths,   CF.months,    ()=>renderConf());
+  buildConfChipSet('confAudienceChips',CONF_AUDIENCES,CF.audiences,()=>renderConf());
+  buildConfChipSet('confThemeChips',   CONF_THEMES,  CF.themes,    ()=>renderConf());
 }
 
 function buildConfChipSet(id,vals,set,cb){
@@ -841,10 +938,13 @@ function filteredConfs(){
   const q=CF.search.toLowerCase();
   return DB.conferences.filter(c=>{
     if(CF.months.size    && !CF.months.has(c.month))       return false;
-    if(CF.audiences.size && !CF.audiences.has(c.audience)) return false;
+    if(CF.audiences.size){
+      const ca=(c.audience||'').toLowerCase();
+      if(![...CF.audiences].some(a=>ca.includes(a.toLowerCase()))) return false;
+    }
     if(CF.themes.size){
-      const cTags=(c.themes||'').split(',').map(t=>t.trim()).filter(Boolean);
-      if(![...CF.themes].some(ft=>cTags.includes(ft))) return false;
+      const ct=(c.themes||'').toLowerCase();
+      if(![...CF.themes].some(t=>ct.includes(t.toLowerCase()))) return false;
     }
     if(q&&![c.name,c.organizer,c.notes,c.audience,c.themes,c.month]
            .some(f=>f&&f.toLowerCase().includes(q))) return false;
@@ -1031,12 +1131,21 @@ function parseBulk(){
   const lines=raw.split('\n').map(l=>l.trim()).filter(l=>l);
   bulkParsed=[]; const errs=[];
   lines.forEach((line,i)=>{
-    const cols=line.includes('\t')?line.split('\t'):line.split(',');
-    const [name,email,outlet,tier,beat,sector,country,type,themes,...rest]=cols.map(c=>c.trim().replace(/^"|"$/g,'').trim());
-    const notes=rest.join(',').trim().replace(/^"|"$/g,'').trim();
+    const cols=(line.includes('\t')?line.split('\t'):line.split(',')).map(c=>c.trim().replace(/^"|"$/g,'').trim());
+    // Auto-detect email column — find the col containing '@'
+    const emailIdx=cols.findIndex(c=>c.includes('@'));
+    if(emailIdx===-1){ errs.push(`Row ${i+1}: no email found`); return; }
+    const email=cols[emailIdx];
+    // Name is the first non-email text column before or after email
+    // Try col before email first, else col after
+    const nameIdx=emailIdx>0?emailIdx-1:emailIdx+1;
+    const name=cols[nameIdx]||'';
     if(!name){ errs.push(`Row ${i+1}: missing name`); return; }
-    if(!email||!email.includes('@')){ errs.push(`Row ${i+1}: invalid email for "${name}"`); return; }
-    bulkParsed.push({id:uid(),name,email,outlet:outlet||'',tier:tier||'',beat:beat||'',sector:sector||'',country:country||'',type:type||'',themes:(themes||'').replace(/;/g,','),notes:notes||''});
+    // Remaining cols (excluding name & email) for other fields
+    const rest=cols.filter((_,idx)=>idx!==emailIdx&&idx!==nameIdx);
+    const [outlet='',tier='',beat='',sector='',country='',type='',themes='',...notesCols]=rest;
+    const notes=notesCols.join(',').trim();
+    bulkParsed.push({id:uid(),name,email,outlet,tier,beat,sector,country,type,themes:themes.replace(/;/g,','),notes});
   });
   const prev=document.getElementById('bulkPreview');
   const btn =document.getElementById('bulkSaveBtn');
@@ -1176,12 +1285,13 @@ function closeSetup(){ document.getElementById('setupModal').classList.remove('o
 // ═══════════════════════════════════════════════════════
 // CLOSE MODALS ON BACKGROUND CLICK
 // ═══════════════════════════════════════════════════════
-['addModal','bulkModal','setupModal','confModal'].forEach(id=>{
+['addModal','bulkModal','setupModal','confModal','confBulkModal'].forEach(id=>{
   document.getElementById(id).addEventListener('click',e=>{
     if(e.target===e.currentTarget){
       if(id==='addModal') closeAdd();
       else if(id==='bulkModal') closeBulk();
       else if(id==='confModal') closeConf();
+      else if(id==='confBulkModal') closeConfBulk();
       else closeSetup();
     }
   });
@@ -1352,7 +1462,8 @@ const SEED_CONFERENCES=[
   {id:uid(),name:"The AI Summit New York",month:"December",startDate:"2026-12-09",endDate:"2026-12-10",audience:"Developers, Enterprises",themes:"AI Infrastructure, AI Applications",organizer:"Caroline Hicks — caroline.hicks@informa.com",notes:"Speakers: Hannah Helin (SVP of Data and Emerging Technologies, NBCUniversal), Nnanna Kalu-Mba (ICT for Development Expert, United Nations Population Fund (UNFPA)) (link to full speakers list)"},
 ];
 
-// ═══════════════════════════════════════════════════════
+
+
 // BOOT
 // ═══════════════════════════════════════════════════════
 bootLoad();
