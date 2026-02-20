@@ -864,15 +864,15 @@ function buildConfChipSet(id,vals,set,cb){
 function filteredReporters(){
   const q=F.search.toLowerCase();
   return DB.reporters.filter(r=>{
-    if(F.tiers.size    && !F.tiers.has(r.tier))    return false;
+    if(F.tiers.size    && ![...F.tiers].some(t=>(r.tier||'').trim().toLowerCase()===t.toLowerCase())) return false;
     if(F.beats.size){
       const beatKeywords={'Funding':['funding'],'Product Launch':['product'],'Market':['market']};
       const rb=(r.beat||'').toLowerCase();
       if(![...F.beats].some(b=>(beatKeywords[b]||[b.toLowerCase()]).some(kw=>rb.includes(kw)))) return false;
     }
     if(F.sectors.size  && !F.sectors.has(r.sector)) return false;
-    if(F.countries.size&& !F.countries.has(r.country)) return false;
-    if(F.types.size    && !F.types.has(r.type))    return false;
+    if(F.countries.size && ![...F.countries].some(c=>(r.country||'').trim().toLowerCase()===c.toLowerCase())) return false;
+    if(F.types.size    && ![...F.types].some(t=>(r.type||'').trim().toLowerCase()===t.toLowerCase())) return false;
     if(q&&![r.name,r.email,r.outlet,r.sector,r.country,r.type,r.notes,r.beat,r.tier,r.themes]
            .some(f=>f&&f.toLowerCase().includes(q))) return false;
     return true;
