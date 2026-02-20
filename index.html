@@ -13,6 +13,8 @@
   --amber:#C47B1A;--amber-bg:#FBF5EA;
   --green:#1E7A4C;--green-bg:#EDF7F2;
   --blue:#1A4BAD;--blue-bg:#EDF2FB;
+  --purple:#6B34AD;--purple-bg:#F3EEF9;
+  --teal:#0E7490;--teal-bg:#EEF9FB;
   --border:rgba(10,10,15,0.10);
 }
 html,body{background:var(--paper);color:var(--ink);font-family:'DM Sans',sans-serif;font-size:14px;min-height:100vh}
@@ -22,6 +24,12 @@ header{background:var(--ink);padding:16px 28px;display:flex;align-items:center;g
 header h1{font-family:'Syne',sans-serif;font-weight:800;font-size:18px;color:#fff;letter-spacing:-0.02em}
 .sub{font-family:'DM Mono',monospace;font-size:10px;color:var(--mid);letter-spacing:0.1em;text-transform:uppercase}
 .hdr-right{margin-left:auto;display:flex;gap:8px;align-items:center}
+
+/* TABS */
+.tab-bar{display:flex;gap:0;padding:0 28px;background:var(--ink);border-bottom:3px solid var(--red);margin-top:-3px;position:sticky;top:63px;z-index:49}
+.tab{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;padding:10px 18px;color:var(--mid);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-3px;transition:all .15s;user-select:none}
+.tab:hover{color:#fff}
+.tab.active{color:#fff;border-bottom-color:var(--red)}
 
 /* sync indicator */
 .sync-pill{display:flex;align-items:center;gap:6px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.04em;color:var(--mid);border:1px solid rgba(255,255,255,0.12);padding:5px 10px;border-radius:3px;white-space:nowrap}
@@ -46,10 +54,11 @@ header h1{font-family:'Syne',sans-serif;font-weight:800;font-size:18px;color:#ff
 .btn-setup-hdr:hover{color:#fff;border-color:#fff}
 
 /* LAYOUT */
-.layout{display:grid;grid-template-columns:260px 1fr;min-height:calc(100vh - 63px)}
+.layout{display:grid;grid-template-columns:260px 1fr;min-height:calc(100vh - 103px)}
+.page{display:none}.page.active{display:grid;grid-template-columns:260px 1fr;min-height:calc(100vh - 103px)}
 
 /* SIDEBAR */
-.sidebar{background:var(--cream);border-right:1px solid var(--border);padding:20px 16px;display:flex;flex-direction:column;gap:18px;overflow-y:auto;max-height:calc(100vh - 63px);position:sticky;top:63px}
+.sidebar{background:var(--cream);border-right:1px solid var(--border);padding:20px 16px;display:flex;flex-direction:column;gap:18px;overflow-y:auto;max-height:calc(100vh - 103px);position:sticky;top:103px}
 .fg label{display:block;font-family:'Syne',sans-serif;font-weight:700;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--steel);margin-bottom:7px}
 .chip-group{display:flex;flex-wrap:wrap;gap:5px}
 .chip{font-family:'DM Mono',monospace;font-size:11px;padding:4px 8px;border-radius:3px;border:1.5px solid var(--border);background:var(--paper);color:var(--steel);cursor:pointer;transition:all .12s;user-select:none}
@@ -88,10 +97,15 @@ tbody td{padding:10px 10px;font-size:13px;vertical-align:middle}
 td.n{font-weight:500}
 td.em{font-family:'DM Mono',monospace;font-size:11px;color:var(--blue);word-break:break-all}
 td.nt{font-size:12px;color:var(--steel)}
-.tag{display:inline-block;font-family:'DM Mono',monospace;font-size:10px;padding:2px 6px;border-radius:2px;white-space:nowrap}
+.tag{display:inline-block;font-family:'DM Mono',monospace;font-size:10px;padding:2px 6px;border-radius:2px;white-space:nowrap;margin:1px}
 .ts{background:var(--blue-bg);color:var(--blue);border:1px solid rgba(26,75,173,0.18)}
 .tc{background:var(--amber-bg);color:var(--amber);border:1px solid rgba(196,123,26,0.18)}
 .tt{background:var(--green-bg);color:var(--green);border:1px solid rgba(30,122,76,0.18)}
+.tp{background:var(--purple-bg);color:var(--purple);border:1px solid rgba(107,52,173,0.18)}
+.tq{background:var(--teal-bg);color:var(--teal);border:1px solid rgba(14,116,144,0.18)}
+.tier1{background:#FFF8E1;color:#B45309;border:1px solid rgba(180,83,9,0.25);font-weight:600}
+.tier2{background:var(--blue-bg);color:var(--blue);border:1px solid rgba(26,75,173,0.18)}
+.tier3{background:var(--cream);color:var(--steel);border:1px solid var(--border)}
 .act-btns{display:flex;gap:5px;opacity:0;transition:opacity .15s}
 tbody tr:hover .act-btns{opacity:1}
 .act-btn{font-family:'DM Mono',monospace;font-size:10px;padding:3px 7px;border-radius:2px;cursor:pointer;border:1px solid;transition:all .12s;background:none}
@@ -99,6 +113,9 @@ tbody tr:hover .act-btns{opacity:1}
 .btn-edit:hover{background:var(--blue);color:#fff}
 .btn-del{color:var(--red);border-color:var(--red)}
 .btn-del:hover{background:var(--red);color:#fff}
+
+/* tags list cell */
+.tags-cell{display:flex;flex-wrap:wrap;gap:2px;max-width:180px}
 
 /* EMPTY */
 .empty{display:none;flex-direction:column;align-items:center;justify-content:center;padding:70px 40px;text-align:center;gap:12px}
@@ -110,9 +127,9 @@ tbody tr:hover .act-btns{opacity:1}
 /* MODAL BASE */
 .mb{position:fixed;inset:0;background:rgba(10,10,15,0.6);display:flex;align-items:center;justify-content:center;z-index:200;opacity:0;pointer-events:none;transition:opacity .2s;backdrop-filter:blur(2px)}
 .mb.on{opacity:1;pointer-events:all}
-.md{background:var(--paper);border-radius:6px;width:540px;max-width:96vw;max-height:92vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,0.3)}
-.md-lg{width:680px}
-.md-xl{width:620px}
+.md{background:var(--paper);border-radius:6px;width:580px;max-width:96vw;max-height:92vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,0.3)}
+.md-lg{width:700px}
+.md-xl{width:640px}
 .mh{background:var(--ink);padding:18px 22px;display:flex;align-items:center;justify-content:space-between;border-radius:6px 6px 0 0;position:sticky;top:0;z-index:2}
 .mh h2{font-family:'Syne',sans-serif;font-weight:800;font-size:14px;color:#fff}
 .mc{background:none;border:none;color:var(--mid);font-size:20px;cursor:pointer;transition:color .15s;line-height:1}
@@ -133,6 +150,15 @@ tbody tr:hover .act-btns{opacity:1}
 .btn-secondary:hover{border-color:var(--ink);color:var(--ink)}
 .btn-danger{font-family:'DM Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.05em;background:var(--red);color:#fff;border:none;border-radius:3px;padding:9px 12px;cursor:pointer;transition:background .15s;margin-right:auto}
 .btn-danger:hover{background:#a82820}
+
+/* multi-tag input */
+.tag-input-wrap{display:flex;flex-wrap:wrap;gap:5px;padding:7px 10px;border:1.5px solid var(--border);border-radius:3px;background:#fff;min-height:38px;cursor:text;transition:border-color .15s}
+.tag-input-wrap:focus-within{border-color:var(--blue)}
+.tag-input-wrap .ti-tag{display:flex;align-items:center;gap:4px;font-family:'DM Mono',monospace;font-size:11px;padding:2px 7px;border-radius:2px;background:var(--ink);color:#fff}
+.tag-input-wrap .ti-tag button{background:none;border:none;color:var(--mid);cursor:pointer;font-size:13px;line-height:1;padding:0}
+.tag-input-wrap .ti-tag button:hover{color:#fff}
+.tag-input-wrap input{border:none;outline:none;font-family:'DM Mono',monospace;font-size:12px;flex:1;min-width:80px;background:transparent;color:var(--ink)}
+.tag-hint{font-family:'DM Mono',monospace;font-size:10px;color:var(--steel);margin-top:4px}
 
 /* BULK */
 .bulk-info{background:var(--blue-bg);border-radius:4px;padding:13px;font-size:12.5px;color:var(--steel);line-height:1.65}
@@ -169,6 +195,9 @@ code{font-family:'DM Mono',monospace;font-size:11px;background:var(--cream);padd
 .toast.s{border-left:3px solid #4ade80}
 .toast.e{border-left:3px solid var(--red)}
 .toast.w{border-left:3px solid var(--amber)}
+
+/* section label in sidebar */
+.sec-label{font-family:'Syne',sans-serif;font-weight:800;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--mid);padding:2px 0}
 </style>
 </head>
 <body>
@@ -181,25 +210,34 @@ code{font-family:'DM Mono',monospace;font-size:11px;background:var(--cream);padd
       <span class="dot"></span>
       <span id="syncLabel">Not connected</span>
     </div>
-    <span class="hbtn-count" id="totalBadge">0 reporters</span>
-    <button class="hbtn btn-bulk"       onclick="openBulk()">⊞ Bulk Add</button>
-    <button class="hbtn btn-add"        onclick="openAdd()">+ Add Reporter</button>
-    <button class="hbtn btn-ghost"      onclick="exportAll()">↓ Backup</button>
+    <span class="hbtn-count" id="totalBadge">0 records</span>
+    <button class="hbtn btn-bulk"       id="bulkBtn"   onclick="openBulk()">⊞ Bulk Add</button>
+    <button class="hbtn btn-add"        id="addBtn"    onclick="openAdd()">+ Add</button>
+    <button class="hbtn btn-ghost"      id="exportBtn" onclick="exportAll()">↓ Backup</button>
     <button class="hbtn btn-setup-hdr"  onclick="openSetup()">⚙</button>
   </div>
 </header>
 
-<div class="layout">
+<!-- TABS -->
+<div class="tab-bar">
+  <div class="tab active" id="tab-reporters" onclick="switchTab('reporters')">◎ Reporters</div>
+  <div class="tab" id="tab-conferences" onclick="switchTab('conferences')">◈ Conferences</div>
+</div>
+
+<!-- ═══ REPORTERS PAGE ═══ -->
+<div class="page active" id="page-reporters">
   <aside class="sidebar">
-    <div class="fg"><label>Search</label><div class="sw"><input type="text" id="searchInput" placeholder="name, outlet, email…"></div></div>
+    <div class="fg"><label>Search</label><div class="sw"><input type="text" id="searchInput" placeholder="name, outlet, beat…"></div></div>
     <div class="div"></div>
+    <div class="sec-label">Filters</div>
+    <div class="fg"><label>Tier</label><div class="chip-group" id="tierChips"></div></div>
+    <div class="fg"><label>Beat</label><div class="chip-group" id="beatChips"></div></div>
     <div class="fg"><label>Sector</label><div class="chip-group" id="sectorChips"></div></div>
     <div class="fg"><label>Country</label><div class="chip-group" id="countryChips"></div></div>
     <div class="fg"><label>Outlet Type</label><div class="chip-group" id="typeChips"></div></div>
     <div class="div"></div>
     <button class="clr-btn" onclick="clearAll()">↺ Clear filters</button>
   </aside>
-
   <div class="main">
     <div class="rbar">
       <div class="rcount"><span id="matchCount">—</span> reporters</div>
@@ -217,7 +255,7 @@ code{font-family:'DM Mono',monospace;font-size:11px;background:var(--cream);padd
       </div>
       <table id="tbl" style="display:none">
         <thead><tr>
-          <th>Outlet</th><th>Reporter</th><th>Email</th><th>Sector</th><th>Type</th><th>Country</th><th>Notes</th><th></th>
+          <th>Outlet</th><th>Reporter</th><th>Email</th><th>Tier</th><th>Beat</th><th>Sector</th><th>Type</th><th>Country</th><th>Themes</th><th>Notes</th><th></th>
         </tr></thead>
         <tbody id="tbody"></tbody>
       </table>
@@ -225,7 +263,44 @@ code{font-family:'DM Mono',monospace;font-size:11px;background:var(--cream);padd
   </div>
 </div>
 
-<!-- ═══ ADD / EDIT MODAL ═══ -->
+<!-- ═══ CONFERENCES PAGE ═══ -->
+<div class="page" id="page-conferences">
+  <aside class="sidebar">
+    <div class="fg"><label>Search</label><div class="sw"><input type="text" id="confSearchInput" placeholder="event name, organizer…"></div></div>
+    <div class="div"></div>
+    <div class="sec-label">Filters</div>
+    <div class="fg"><label>Month</label><div class="chip-group" id="confMonthChips"></div></div>
+    <div class="fg"><label>Audience</label><div class="chip-group" id="confAudienceChips"></div></div>
+    <div class="fg"><label>Themes</label><div class="chip-group" id="confThemeChips"></div></div>
+    <div class="div"></div>
+    <button class="clr-btn" onclick="clearConfAll()">↺ Clear filters</button>
+  </aside>
+  <div class="main">
+    <div class="rbar">
+      <div class="rcount"><span id="confMatchCount">—</span> events</div>
+      <div class="pills" id="confActivePills"></div>
+      <div class="exp-group">
+        <button class="ebtn btn-csv" onclick="exportConfCSV()">↓ CSV</button>
+        <button class="ebtn btn-cp"  onclick="copyConfForSheets()">⎘ Copy for Sheets</button>
+      </div>
+    </div>
+    <div class="tw">
+      <div class="empty on" id="confEmptyState">
+        <div class="ei">◈</div>
+        <h3 id="confEmptyTitle">No conferences yet</h3>
+        <p id="confEmptyMsg">Click + Add to log your first conference.</p>
+      </div>
+      <table id="confTbl" style="display:none">
+        <thead><tr>
+          <th>Month</th><th>Start Date</th><th>End Date</th><th>Event Name</th><th>Audience</th><th>Themes</th><th>Organizer Contact</th><th></th>
+        </tr></thead>
+        <tbody id="confTbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ REPORTER ADD / EDIT MODAL ═══ -->
 <div class="mb" id="addModal">
   <div class="md">
     <div class="mh"><h2 id="addModalTitle">+ Add Reporter</h2><button class="mc" onclick="closeAdd()">✕</button></div>
@@ -234,6 +309,12 @@ code{font-family:'DM Mono',monospace;font-size:11px;background:var(--cream);padd
         <div class="field"><label>Name *</label><input id="f-name" type="text" placeholder="James Walker"></div>
         <div class="field"><label>Email *</label><input id="f-email" type="email" placeholder="j.walker@ft.com"></div>
         <div class="field"><label>Outlet</label><input id="f-outlet" type="text" placeholder="Financial Times"></div>
+        <div class="field"><label>Tier</label>
+          <select id="f-tier"><option value="">— select —</option><option>Tier 1</option><option>Tier 2</option><option>Tier 3</option></select>
+        </div>
+        <div class="field"><label>Beat</label>
+          <select id="f-beat"><option value="">— select —</option><option>Markets</option><option>Funding News</option><option>Product News</option><option>Policy & Regulation</option><option>Technology</option><option>Crypto & DeFi</option><option>General Business</option></select>
+        </div>
         <div class="field"><label>Sector</label>
           <select id="f-sector"><option value="">— select —</option><option>AI</option><option>Business</option><option>Markets</option><option>Finance</option><option>Crypto</option><option>Mainstream</option><option>Technology</option></select>
         </div>
@@ -241,7 +322,15 @@ code{font-family:'DM Mono',monospace;font-size:11px;background:var(--cream);padd
           <select id="f-country"><option value="">— select —</option><option>UK</option><option>UAE</option><option>France</option><option>Germany</option><option>Switzerland</option><option>South Korea</option><option>Singapore</option><option>Hong Kong</option><option>Thailand</option><option>Japan</option><option>US</option><option>Other</option></select>
         </div>
         <div class="field"><label>Outlet Type</label>
-          <select id="f-type"><option value="">— select —</option><option>Publication</option><option>Podcast</option><option>Broadcast</option><option>Magazine</option></select>
+          <select id="f-type"><option value="">— select —</option><option>Publication</option><option>Podcast</option><option>Broadcast</option><option>Magazine</option><option>Newsletter</option></select>
+        </div>
+        <div class="field full">
+          <label>Themes <span style="font-weight:400;text-transform:none;letter-spacing:0">(type & press Enter or comma)</span></label>
+          <div class="tag-input-wrap" id="themeTagWrap" onclick="document.getElementById('themeTagInput').focus()">
+            <input type="text" id="themeTagInput" placeholder="e.g. Fintech, DeFi, Web3…">
+          </div>
+          <div class="tag-hint">Press Enter or comma to add each theme</div>
+          <input type="hidden" id="f-themes">
         </div>
         <div class="field full"><label>Notes</label><textarea id="f-notes" placeholder="e.g. Senior fintech reporter, covers DeFi…"></textarea></div>
       </div>
@@ -254,6 +343,38 @@ code{font-family:'DM Mono',monospace;font-size:11px;background:var(--cream);padd
   </div>
 </div>
 
+<!-- ═══ CONFERENCE ADD / EDIT MODAL ═══ -->
+<div class="mb" id="confModal">
+  <div class="md">
+    <div class="mh"><h2 id="confModalTitle">+ Add Conference</h2><button class="mc" onclick="closeConf()">✕</button></div>
+    <div class="mb-body">
+      <div class="form-grid">
+        <div class="field full"><label>Event Name *</label><input id="cf-name" type="text" placeholder="Money 20/20"></div>
+        <div class="field"><label>Start Date *</label><input id="cf-start" type="date"></div>
+        <div class="field"><label>End Date</label><input id="cf-end" type="date"></div>
+        <div class="field"><label>Audience</label>
+          <select id="cf-audience"><option value="">— select —</option><option>Developers</option><option>Enterprises</option><option>Investors</option><option>Developers & Enterprises</option><option>Enterprises & Investors</option><option>All</option></select>
+        </div>
+        <div class="field"><label>Organizer Contact</label><input id="cf-organizer" type="text" placeholder="Name / email / company"></div>
+        <div class="field full">
+          <label>Themes <span style="font-weight:400;text-transform:none;letter-spacing:0">(type & press Enter or comma)</span></label>
+          <div class="tag-input-wrap" id="confThemeTagWrap" onclick="document.getElementById('confThemeTagInput').focus()">
+            <input type="text" id="confThemeTagInput" placeholder="e.g. DeFi, Payments, AI…">
+          </div>
+          <div class="tag-hint">Press Enter or comma to add each theme</div>
+          <input type="hidden" id="cf-themes">
+        </div>
+        <div class="field full"><label>Notes</label><textarea id="cf-notes" placeholder="Location, cost, deadlines…"></textarea></div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-danger" id="confDeleteBtn" onclick="deleteConf()" style="display:none">Delete</button>
+        <button class="btn-secondary" onclick="closeConf()">Cancel</button>
+        <button class="btn-primary" onclick="saveConf()">Save Event</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ═══ BULK ADD MODAL ═══ -->
 <div class="mb" id="bulkModal">
   <div class="md md-lg">
@@ -261,12 +382,12 @@ code{font-family:'DM Mono',monospace;font-size:11px;background:var(--cream);padd
     <div class="mb-body">
       <div class="bulk-info">
         Paste your list below — one reporter per line.<br>
-        Column order: <code>Name</code> · <code>Email</code> · <code>Outlet</code> · <code>Sector</code> · <code>Country</code> · <code>Type</code> · <code>Notes</code><br>
-        <strong>Tip:</strong> Copy rows straight from Google Sheets or Excel and paste — tabs are handled automatically. Only Name and Email are required.
+        Column order: <code>Name</code> · <code>Email</code> · <code>Outlet</code> · <code>Tier</code> · <code>Beat</code> · <code>Sector</code> · <code>Country</code> · <code>Type</code> · <code>Themes</code> · <code>Notes</code><br>
+        <strong>Tip:</strong> Copy rows straight from Google Sheets or Excel. Only Name and Email are required. Themes can be semicolon-separated within a cell.
       </div>
       <div class="field">
         <label>Paste your list here</label>
-        <textarea class="bulk-ta" id="bulkInput" placeholder="James Walker&#9;j.walker@ft.com&#9;Financial Times&#9;Finance&#9;UK&#9;Publication&#9;Senior fintech&#10;Sarah Chen&#9;s.chen@bloomberg.com&#9;Bloomberg&#9;Markets&#9;UAE&#9;Publication" oninput="parseBulk()"></textarea>
+        <textarea class="bulk-ta" id="bulkInput" placeholder="James Walker&#9;j.walker@ft.com&#9;Financial Times&#9;Tier 1&#9;Markets&#9;Finance&#9;UK&#9;Publication&#9;Fintech;DeFi&#9;Senior fintech reporter" oninput="parseBulk()"></textarea>
       </div>
       <div id="bulkPreview"></div>
       <div class="modal-actions">
@@ -282,32 +403,28 @@ code{font-family:'DM Mono',monospace;font-size:11px;background:var(--cream);padd
   <div class="md md-xl">
     <div class="mh"><h2>⚙ &nbsp;Connect Shared Database</h2><button class="mc" onclick="closeSetup()">✕</button></div>
     <div class="mb-body">
-
       <div class="setup-note">
         This connects all team members to the same live reporter list. One person sets it up once — everyone else just needs the API key pasted in.
       </div>
-
       <div class="step">
         <div class="step-num">1</div>
         <div class="step-content">
           <h4>Create a free JSONBin account</h4>
-          <p>Go to <strong>jsonbin.io</strong> → click <strong>Sign Up</strong> → use a team email (e.g. your agency Google account) so anyone can log in if needed.</p>
+          <p>Go to <strong>jsonbin.io</strong> → click <strong>Sign Up</strong> → use a team email so anyone can log in if needed.</p>
         </div>
       </div>
-
       <div class="step">
         <div class="step-num">2</div>
         <div class="step-content">
           <h4>Get your API key</h4>
-          <p>After signing in, click your profile icon → <strong>API Keys</strong> → copy the <strong>Master Key</strong> (starts with <code>$2b$</code>…). This is the only key you'll ever need.</p>
+          <p>After signing in, click your profile icon → <strong>API Keys</strong> → copy the <strong>Master Key</strong> (starts with <code>$2b$</code>…).</p>
         </div>
       </div>
-
       <div class="step">
         <div class="step-num">3</div>
         <div class="step-content">
           <h4>Paste your Master Key below</h4>
-          <p>The app will create a private bin automatically and store the database there. Share the key with teammates so they can paste it into their own copy of the app.</p>
+          <p>The app will create a private bin automatically and store the database there. Share the key with teammates so they can connect their own copy.</p>
           <div class="key-wrap">
             <input type="password" id="apiKeyInput" placeholder="$2b$10$…paste your JSONBin master key…" autocomplete="off">
             <button class="btn-connect" onclick="connectDB()">Connect</button>
@@ -315,15 +432,13 @@ code{font-family:'DM Mono',monospace;font-size:11px;background:var(--cream);padd
           <div class="conn-status" id="connStatus"></div>
         </div>
       </div>
-
       <div class="step">
         <div class="step-num">4</div>
         <div class="step-content">
           <h4>Share with your team</h4>
-          <p>Once connected, share two things with teammates: the hosted URL of this app (e.g. your GitHub Pages URL) and the JSONBin Master Key. They paste the key once and are instantly on the same live list.</p>
+          <p>Share the hosted URL of this app and the JSONBin Master Key. Teammates paste the key once and are instantly on the same live list.</p>
         </div>
       </div>
-
     </div>
   </div>
 </div>
@@ -335,143 +450,212 @@ code{font-family:'DM Mono',monospace;font-size:11px;background:var(--cream);padd
 // CONFIG
 // ═══════════════════════════════════════════════════════
 const JSONBIN_BASE = 'https://api.jsonbin.io/v3';
-const LOCAL_KEY    = 'fb_pr_v3';           // localStorage key for creds
-const CACHE_KEY    = 'fb_pr_cache_v3';     // localStorage key for data cache
+const LOCAL_KEY    = 'fb_pr_v4';
+const CACHE_KEY    = 'fb_pr_cache_v4';
 
 // ═══════════════════════════════════════════════════════
 // CREDENTIAL STORAGE
 // ═══════════════════════════════════════════════════════
 function getCreds(){ try{ return JSON.parse(localStorage.getItem(LOCAL_KEY))||{}; }catch{ return {}; } }
 function saveCreds(obj){ localStorage.setItem(LOCAL_KEY, JSON.stringify(obj)); }
-function getCache(){ try{ return JSON.parse(localStorage.getItem(CACHE_KEY))||[]; }catch{ return []; } }
+function getCache(){ try{ return JSON.parse(localStorage.getItem(CACHE_KEY))||{reporters:[],conferences:[]}; }catch{ return {reporters:[],conferences:[]}; } }
 function saveCache(d){ localStorage.setItem(CACHE_KEY, JSON.stringify(d)); }
 
 // ═══════════════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════════════
-let DB = [];
+let DB = { reporters: [], conferences: [] };
 let isSaving = false;
-const F = {sectors:new Set(), countries:new Set(), types:new Set(), search:''};
+const F = { tiers:new Set(), beats:new Set(), sectors:new Set(), countries:new Set(), types:new Set(), search:'' };
+const CF = { months:new Set(), audiences:new Set(), themes:new Set(), search:'' };
 let editingId = null;
+let confEditingId = null;
 let bulkParsed = [];
+let currentTab = 'reporters';
+
+// tag inputs state
+let reporterTags = [];
+let confTags = [];
 
 function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
 
 // ═══════════════════════════════════════════════════════
-// JSONBIN API
+// TAB SWITCHING
 // ═══════════════════════════════════════════════════════
-async function apiGet(path, key){
-  const r = await fetch(JSONBIN_BASE+path, {headers:{'X-Master-Key':key}});
-  if(!r.ok) throw new Error(`${r.status} ${r.statusText}`);
-  return r.json();
-}
-async function apiPost(path, key, body){
-  const r = await fetch(JSONBIN_BASE+path, {
-    method:'POST', headers:{'X-Master-Key':key,'Content-Type':'application/json'},
-    body: JSON.stringify(body)
-  });
-  if(!r.ok) throw new Error(`${r.status} ${r.statusText}`);
-  return r.json();
-}
-async function apiPut(path, key, body){
-  const r = await fetch(JSONBIN_BASE+path, {
-    method:'PUT', headers:{'X-Master-Key':key,'Content-Type':'application/json'},
-    body: JSON.stringify(body)
-  });
-  if(!r.ok) throw new Error(`${r.status} ${r.statusText}`);
-  return r.json();
+function switchTab(tab){
+  currentTab = tab;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+  document.getElementById('page-'+tab).classList.add('active');
+
+  if(tab==='reporters'){
+    document.getElementById('bulkBtn').style.display='';
+    document.getElementById('addBtn').textContent='+ Add Reporter';
+    document.getElementById('addBtn').onclick=openAdd;
+    document.getElementById('exportBtn').onclick=exportAll;
+    document.getElementById('totalBadge').textContent=DB.reporters.length+' reporters';
+  } else {
+    document.getElementById('bulkBtn').style.display='none';
+    document.getElementById('addBtn').textContent='+ Add Conference';
+    document.getElementById('addBtn').onclick=openConf;
+    document.getElementById('exportBtn').onclick=exportConfAll;
+    document.getElementById('totalBadge').textContent=DB.conferences.length+' events';
+  }
 }
 
 // ═══════════════════════════════════════════════════════
-// CONNECT — called from setup modal
+// TAG INPUT WIDGET
+// ═══════════════════════════════════════════════════════
+function initTagInput(wrapId, inputId, hiddenId, tagsArr){
+  const wrap  = document.getElementById(wrapId);
+  const input = document.getElementById(inputId);
+  const hidden= document.getElementById(hiddenId);
+
+  // clear existing tags
+  wrap.querySelectorAll('.ti-tag').forEach(t=>t.remove());
+  tagsArr.length=0;
+
+  function addTag(val){
+    val = val.trim().replace(/,$/,'').trim();
+    if(!val || tagsArr.includes(val)) return;
+    tagsArr.push(val);
+    const span = document.createElement('span');
+    span.className='ti-tag';
+    span.innerHTML=`${x(val)}<button type="button" onclick="removeTag('${wrapId}','${inputId}','${hiddenId}',this,'${val.replace(/'/g,"\\'")}',${wrapId==='themeTagWrap'?'reporterTags':'confTags'})">×</button>`;
+    wrap.insertBefore(span,input);
+    hidden.value=tagsArr.join(',');
+    input.value='';
+  }
+
+  input.onkeydown=e=>{
+    if((e.key==='Enter'||e.key===',')&&input.value.trim()){e.preventDefault();addTag(input.value);}
+    if(e.key==='Backspace'&&!input.value&&tagsArr.length){
+      const last=tagsArr[tagsArr.length-1];
+      removeTag(wrapId,inputId,hiddenId,null,last,tagsArr);
+    }
+  };
+  input.oninput=()=>{ if(input.value.endsWith(',')){ addTag(input.value); } };
+}
+
+function removeTag(wrapId,inputId,hiddenId,btn,val,arr){
+  // arr might be passed as the array reference via onclick string — re-resolve
+  const tagsArr = (wrapId==='themeTagWrap')?reporterTags:confTags;
+  const idx=tagsArr.indexOf(val);
+  if(idx>-1) tagsArr.splice(idx,1);
+  // remove the span
+  const wrap=document.getElementById(wrapId);
+  wrap.querySelectorAll('.ti-tag').forEach(sp=>{
+    if(sp.textContent.replace('×','').trim()===val) sp.remove();
+  });
+  document.getElementById(hiddenId).value=tagsArr.join(',');
+}
+
+function loadTagsIntoInput(wrapId,inputId,hiddenId,tagsArr,values){
+  initTagInput(wrapId,inputId,hiddenId,tagsArr);
+  const input=document.getElementById(inputId);
+  values.forEach(v=>{
+    const wrap=document.getElementById(wrapId);
+    const hidden=document.getElementById(hiddenId);
+    if(!v||tagsArr.includes(v)) return;
+    tagsArr.push(v);
+    const span=document.createElement('span');
+    span.className='ti-tag';
+    span.innerHTML=`${x(v)}<button type="button" onclick="removeTag('${wrapId}','${inputId}','${hiddenId}',this,'${v.replace(/'/g,"\\'")}',null)">×</button>`;
+    wrap.insertBefore(span,input);
+    hidden.value=tagsArr.join(',');
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// JSONBIN API
+// ═══════════════════════════════════════════════════════
+async function apiGet(path,key){ const r=await fetch(JSONBIN_BASE+path,{headers:{'X-Master-Key':key}}); if(!r.ok) throw new Error(`${r.status} ${r.statusText}`); return r.json(); }
+async function apiPost(path,key,body){ const r=await fetch(JSONBIN_BASE+path,{method:'POST',headers:{'X-Master-Key':key,'Content-Type':'application/json'},body:JSON.stringify(body)}); if(!r.ok) throw new Error(`${r.status} ${r.statusText}`); return r.json(); }
+async function apiPut(path,key,body){ const r=await fetch(JSONBIN_BASE+path,{method:'PUT',headers:{'X-Master-Key':key,'Content-Type':'application/json'},body:JSON.stringify(body)}); if(!r.ok) throw new Error(`${r.status} ${r.statusText}`); return r.json(); }
+
+// ═══════════════════════════════════════════════════════
+// CONNECT
 // ═══════════════════════════════════════════════════════
 async function connectDB(){
   const key = document.getElementById('apiKeyInput').value.trim();
   if(!key){ setConnStatus('Please paste your Master Key','err'); return; }
-
   setConnStatus('Connecting…','');
   setSyncPill('saving','Connecting…');
-
   try {
     const creds = getCreds();
-
-    // If we already have a bin ID stored with this key, just verify it works
-    if(creds.binId && creds.apiKey === key){
-      const data = await apiGet(`/b/${creds.binId}/latest`, key);
-      DB = data.record.reporters || [];
+    if(creds.binId && creds.apiKey===key){
+      const data = await apiGet(`/b/${creds.binId}/latest`,key);
+      DB = normalizeDB(data.record);
       saveCache(DB);
-      setConnStatus(`✓ Reconnected — ${DB.length} reporters loaded`, 'ok');
-      finishConnect(key, creds.binId);
-      return;
+      setConnStatus(`✓ Reconnected — ${DB.reporters.length} reporters loaded`,'ok');
+      finishConnect(key,creds.binId); return;
     }
-
-    // Otherwise create a new bin
-    const res = await apiPost('/b', key, {
-      reporters: SEED_DATA,
-      meta: { app:'hokku_pr_media_db', created: new Date().toISOString() }
-    });
+    const res = await apiPost('/b',key,{ reporters:SEED_DATA, conferences:SEED_CONFERENCES, meta:{app:'hokku_pr_v2',created:new Date().toISOString()} });
     const binId = res.metadata.id;
-    DB = SEED_DATA;
+    DB = { reporters:SEED_DATA, conferences:SEED_CONFERENCES };
     saveCache(DB);
-    saveCreds({ apiKey: key, binId });
-    setConnStatus(`✓ Database created — ${DB.length} reporters loaded`, 'ok');
-    finishConnect(key, binId);
-
+    saveCreds({apiKey:key,binId});
+    setConnStatus(`✓ Database created — ${DB.reporters.length} reporters loaded`,'ok');
+    finishConnect(key,binId);
   } catch(err){
-    setConnStatus(`✗ ${err.message} — check your key and try again`, 'err');
-    setSyncPill('error', 'Connection failed');
+    setConnStatus(`✗ ${err.message} — check your key and try again`,'err');
+    setSyncPill('error','Connection failed');
   }
 }
 
-function finishConnect(key, binId){
-  saveCreds({ apiKey: key, binId });
-  closeSetup();
-  setSyncPill('live', `Live · ${DB.length} reporters`);
-  buildAllChips(); render();
-  toast(`Connected — ${DB.length} reporters loaded`, 's');
+function normalizeDB(record){
+  if(Array.isArray(record)) return {reporters:record, conferences:[]};
+  return { reporters: record.reporters||[], conferences: record.conferences||[] };
 }
 
-function setConnStatus(msg, cls){
-  const el = document.getElementById('connStatus');
-  el.textContent = msg; el.className = 'conn-status ' + cls;
+function finishConnect(key,binId){
+  saveCreds({apiKey:key,binId});
+  closeSetup();
+  setSyncPill('live',`Live · ${DB.reporters.length} reporters`);
+  buildAllChips(); render(); buildConfChips(); renderConf();
+  toast(`Connected — ${DB.reporters.length} reporters loaded`,'s');
+}
+
+function setConnStatus(msg,cls){
+  const el=document.getElementById('connStatus');
+  el.textContent=msg; el.className='conn-status '+cls;
 }
 
 // ═══════════════════════════════════════════════════════
-// LOAD ON BOOT
+// BOOT
 // ═══════════════════════════════════════════════════════
 async function bootLoad(){
-  const creds = getCreds();
-  if(!creds.apiKey || !creds.binId){
-    // Show cached data if any, but mark offline
-    const cached = getCache();
-    if(cached.length){
-      DB = cached;
+  const creds=getCreds();
+  if(!creds.apiKey||!creds.binId){
+    const cached=getCache();
+    if(cached.reporters&&cached.reporters.length){
+      DB=normalizeDB(cached);
       setSyncPill('offline','Offline — cached data');
-      buildAllChips(); render();
+      buildAllChips(); render(); buildConfChips(); renderConf();
       toast('Showing cached data — open ⚙ to reconnect','w');
     } else {
-      setSyncPill('offline','Not connected');
-      render();
+      // No cache, no creds — load seed data so filters are visible immediately
+      DB = { reporters: SEED_DATA, conferences: SEED_CONFERENCES };
+      setSyncPill('offline','Not connected — demo data');
+      buildAllChips(); render(); buildConfChips(); renderConf();
     }
     return;
   }
-
-  // Show cached immediately, then refresh from server
-  const cached = getCache();
-  if(cached.length){
-    DB = cached;
+  const cached=getCache();
+  if(cached.reporters&&cached.reporters.length){
+    DB=normalizeDB(cached);
     setSyncPill('saving','Syncing…');
-    buildAllChips(); render();
+    buildAllChips(); render(); buildConfChips(); renderConf();
   }
-
   try {
-    const data = await apiGet(`/b/${creds.binId}/latest`, creds.apiKey);
-    DB = data.record.reporters || [];
+    const data=await apiGet(`/b/${creds.binId}/latest`,creds.apiKey);
+    DB=normalizeDB(data.record);
     saveCache(DB);
-    setSyncPill('live', `Live · ${DB.length} reporters`);
-    buildAllChips(); render();
+    setSyncPill('live',`Live · ${DB.reporters.length} reporters`);
+    buildAllChips(); render(); buildConfChips(); renderConf();
   } catch(err){
-    if(cached.length){
+    if(cached.reporters&&cached.reporters.length){
       setSyncPill('offline','Offline — cached data');
       toast('Could not reach server — showing last cached data','w');
     } else {
@@ -482,185 +666,354 @@ async function bootLoad(){
 }
 
 // ═══════════════════════════════════════════════════════
-// SAVE TO JSONBIN (debounced)
+// SAVE
 // ═══════════════════════════════════════════════════════
 let saveTimer;
 function scheduleSave(){
-  saveCache(DB); // always save locally immediately
+  saveCache(DB);
   clearTimeout(saveTimer);
-  saveTimer = setTimeout(pushToServer, 800);
+  saveTimer=setTimeout(pushToServer,800);
 }
-
 async function pushToServer(){
-  const creds = getCreds();
-  if(!creds.apiKey || !creds.binId) return;
-  isSaving = true;
+  const creds=getCreds();
+  if(!creds.apiKey||!creds.binId) return;
+  isSaving=true;
   setSyncPill('saving','Saving…');
   try {
-    await apiPut(`/b/${creds.binId}`, creds.apiKey, { reporters: DB });
-    setSyncPill('live', `Live · ${DB.length} reporters`);
+    await apiPut(`/b/${creds.binId}`,creds.apiKey,{ reporters:DB.reporters, conferences:DB.conferences });
+    setSyncPill('live',`Live · ${DB.reporters.length} reporters`);
   } catch(err){
     setSyncPill('error','Save failed');
     toast('Could not save — check your connection','e');
   }
-  isSaving = false;
+  isSaving=false;
+}
+
+function setSyncPill(cls,label){
+  const el=document.getElementById('syncPill');
+  el.className='sync-pill '+cls;
+  document.getElementById('syncLabel').textContent=label;
 }
 
 // ═══════════════════════════════════════════════════════
-// SYNC PILL
+// REPORTER CHIPS / FILTERS
 // ═══════════════════════════════════════════════════════
-function setSyncPill(cls, label){
-  const el = document.getElementById('syncPill');
-  el.className = 'sync-pill ' + cls;
-  document.getElementById('syncLabel').textContent = label;
-}
+function uniqTags(arr,key){ const all=[]; arr.forEach(r=>(r[key]||'').split(',').map(t=>t.trim()).filter(Boolean).forEach(t=>all.push(t))); return [...new Set(all)].sort(); }
 
-// ═══════════════════════════════════════════════════════
-// CHIPS / FILTERS
-// ═══════════════════════════════════════════════════════
-function uniq(key){ return [...new Set(DB.map(r=>r[key]).filter(Boolean))].sort(); }
+// Hardcoded filter lists — always fixed regardless of data
+const OUTLET_TYPES = ['Publication','Podcast','Broadcast','Magazine','Newsletter'];
+const BEATS        = ['Funding','Product Launch','Market'];
+const SECTORS      = ['AI','Business','Crypto','Finance','News','Technology'];
+const COUNTRIES    = ['France','Germany','Hong Kong','Japan','Singapore','South Korea','Switzerland','Thailand','UAE','UK','US','Other'];
+const TIERS        = ['Tier 1','Tier 2','Tier 3'];
 
 function buildAllChips(){
-  buildChips('sectorChips',  uniq('sector'),  F.sectors);
-  buildChips('countryChips', uniq('country'), F.countries);
-  buildChips('typeChips',    uniq('type'),    F.types);
+  buildChips('tierChips',   TIERS,                            F.tiers);
+  buildChips('beatChips',   BEATS,                            F.beats);
+  buildChips('sectorChips', SECTORS,                          F.sectors);
+  buildChips('countryChips',COUNTRIES,                        F.countries);
+  buildChips('typeChips',   OUTLET_TYPES,                     F.types);
 }
 
-function buildChips(id, vals, set){
-  const el = document.getElementById(id); el.innerHTML = '';
-  const a = mkChip('All','__all__',true);
-  a.onclick = ()=>{ set.clear(); syncC(el,set); render(); };
+function buildChips(id,vals,set){
+  const el=document.getElementById(id); el.innerHTML='';
+  const a=mkChip('All','__all__',true);
+  a.onclick=()=>{ set.clear(); syncC(el,set); render(); };
   el.appendChild(a);
   vals.forEach(v=>{
-    const c = mkChip(v,v,false);
-    c.onclick = ()=>{ set.has(v)?set.delete(v):set.add(v); syncC(el,set); render(); };
+    const c=mkChip(v,v,false);
+    c.onclick=()=>{ set.has(v)?set.delete(v):set.add(v); syncC(el,set); render(); };
     el.appendChild(c);
   });
 }
 function mkChip(label,val,isAll){
-  const d = document.createElement('div');
-  d.className = 'chip' + (isAll?' all on':'');
-  d.textContent = label; d.dataset.v = val; return d;
+  const d=document.createElement('div');
+  d.className='chip'+(isAll?' all on':'');
+  d.textContent=label; d.dataset.v=val; return d;
 }
-function syncC(el, set){
+function syncC(el,set){
   el.querySelectorAll('.chip').forEach(c=>{
-    c.dataset.v==='__all__'
-      ? c.classList.toggle('on', set.size===0)
-      : c.classList.toggle('on', set.has(c.dataset.v));
+    c.dataset.v==='__all__'?c.classList.toggle('on',set.size===0):c.classList.toggle('on',set.has(c.dataset.v));
   });
 }
 
 // ═══════════════════════════════════════════════════════
-// FILTER + RENDER
+// CONFERENCE CHIPS / FILTERS
 // ═══════════════════════════════════════════════════════
-function filtered(){
-  const q = F.search.toLowerCase();
-  return DB.filter(r=>{
-    if(F.sectors.size   && !F.sectors.has(r.sector))    return false;
-    if(F.countries.size && !F.countries.has(r.country)) return false;
-    if(F.types.size     && !F.types.has(r.type))        return false;
-    if(q && ![r.name,r.email,r.outlet,r.sector,r.country,r.type,r.notes]
-             .some(f=>f&&f.toLowerCase().includes(q)))   return false;
+const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+function buildConfChips(){
+  const usedMonths=[...new Set(DB.conferences.map(c=>c.month).filter(Boolean))].sort((a,b)=>MONTHS.indexOf(a)-MONTHS.indexOf(b));
+  buildConfChipSet('confMonthChips',   usedMonths,                              CF.months,    ()=>renderConf());
+  buildConfChipSet('confAudienceChips',uniq(DB.conferences,'audience'),         CF.audiences, ()=>renderConf());
+  buildConfChipSet('confThemeChips',   uniqTags(DB.conferences,'themes'),       CF.themes,    ()=>renderConf());
+}
+
+function buildConfChipSet(id,vals,set,cb){
+  const el=document.getElementById(id); el.innerHTML='';
+  const a=mkChip('All','__all__',true);
+  a.onclick=()=>{ set.clear(); syncC(el,set); cb(); };
+  el.appendChild(a);
+  vals.forEach(v=>{
+    const c=mkChip(v,v,false);
+    c.onclick=()=>{ set.has(v)?set.delete(v):set.add(v); syncC(el,set); cb(); };
+    el.appendChild(c);
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// REPORTER FILTER + RENDER
+// ═══════════════════════════════════════════════════════
+function filteredReporters(){
+  const q=F.search.toLowerCase();
+  return DB.reporters.filter(r=>{
+    if(F.tiers.size    && !F.tiers.has(r.tier))    return false;
+    if(F.beats.size){
+      const beatKeywords={'Funding':['funding'],'Product Launch':['product'],'Market':['market']};
+      const rb=(r.beat||'').toLowerCase();
+      if(![...F.beats].some(b=>(beatKeywords[b]||[b.toLowerCase()]).some(kw=>rb.includes(kw)))) return false;
+    }
+    if(F.sectors.size  && !F.sectors.has(r.sector)) return false;
+    if(F.countries.size&& !F.countries.has(r.country)) return false;
+    if(F.types.size    && !F.types.has(r.type))    return false;
+    if(q&&![r.name,r.email,r.outlet,r.sector,r.country,r.type,r.notes,r.beat,r.tier,r.themes]
+           .some(f=>f&&f.toLowerCase().includes(q))) return false;
     return true;
   });
 }
 
 function render(){
-  const rows = filtered();
-  document.getElementById('matchCount').textContent = rows.length;
-  document.getElementById('totalBadge').textContent = DB.length + ' reporters';
+  const rows=filteredReporters();
+  document.getElementById('matchCount').textContent=rows.length;
+  document.getElementById('totalBadge').textContent=(currentTab==='reporters'?DB.reporters.length+' reporters':DB.conferences.length+' events');
 
-  const pills = document.getElementById('activePills'); pills.innerHTML = '';
-  [...F.sectors,...F.countries,...F.types].forEach(v=>{
+  const pills=document.getElementById('activePills'); pills.innerHTML='';
+  [...F.tiers,...F.beats,...F.sectors,...F.countries,...F.types].forEach(v=>{
     const p=document.createElement('span'); p.className='pill'; p.textContent=v; pills.appendChild(p);
   });
   if(F.search){ const p=document.createElement('span'); p.className='pill'; p.textContent=`"${F.search}"`; pills.appendChild(p); }
 
-  const empty = document.getElementById('emptyState');
-  const tbl   = document.getElementById('tbl');
-
+  const empty=document.getElementById('emptyState');
+  const tbl  =document.getElementById('tbl');
   if(rows.length===0){
     empty.classList.add('on'); tbl.style.display='none';
-    if(DB.length===0 && !getCreds().binId){
-      document.getElementById('emptyTitle').textContent = 'Not connected yet';
-      document.getElementById('emptyMsg').textContent   = 'Click ⚙ in the top right to connect your shared database.';
-    } else if(DB.length===0){
-      document.getElementById('emptyTitle').textContent = 'No reporters yet';
-      document.getElementById('emptyMsg').textContent   = 'Click + Add Reporter or ⊞ Bulk Add to get started.';
+    if(DB.reporters.length===0&&!getCreds().binId){
+      document.getElementById('emptyTitle').textContent='Not connected yet';
+      document.getElementById('emptyMsg').textContent='Click ⚙ in the top right to connect your shared database.';
+    } else if(DB.reporters.length===0){
+      document.getElementById('emptyTitle').textContent='No reporters yet';
+      document.getElementById('emptyMsg').textContent='Click + Add Reporter or ⊞ Bulk Add to get started.';
     } else {
-      document.getElementById('emptyTitle').textContent = 'No reporters match';
-      document.getElementById('emptyMsg').textContent   = 'Try broadening your filters or clearing the search.';
+      document.getElementById('emptyTitle').textContent='No reporters match';
+      document.getElementById('emptyMsg').textContent='Try broadening your filters or clearing the search.';
     }
     return;
   }
-  empty.classList.remove('on'); tbl.style.display = '';
+  empty.classList.remove('on'); tbl.style.display='';
 
-  document.getElementById('tbody').innerHTML = rows.map(r=>`<tr>
-    <td>${x(r.outlet)}</td>
-    <td class="n">${x(r.name)}</td>
-    <td class="em">${x(r.email)}</td>
-    <td>${r.sector  ?`<span class="tag ts">${x(r.sector)}</span>` :'—'}</td>
-    <td>${r.type    ?`<span class="tag tt">${x(r.type)}</span>`   :'—'}</td>
-    <td>${r.country ?`<span class="tag tc">${x(r.country)}</span>`:'—'}</td>
-    <td class="nt">${x(r.notes)}</td>
-    <td><div class="act-btns">
-      <button class="act-btn btn-edit" onclick="openEdit('${r.id}')">Edit</button>
-      <button class="act-btn btn-del"  onclick="confirmDel('${r.id}')">✕</button>
-    </div></td>
-  </tr>`).join('');
+  document.getElementById('tbody').innerHTML=rows.map(r=>{
+    const themeTags=(r.themes||'').split(',').map(t=>t.trim()).filter(Boolean)
+      .map(t=>`<span class="tag tq">${x(t)}</span>`).join('');
+    const tierCls=r.tier==='Tier 1'?'tier1':r.tier==='Tier 2'?'tier2':'tier3';
+    return `<tr>
+      <td>${x(r.outlet)}</td>
+      <td class="n">${x(r.name)}</td>
+      <td class="em">${x(r.email)}</td>
+      <td>${r.tier?`<span class="tag ${tierCls}">${x(r.tier)}</span>`:'—'}</td>
+      <td>${r.beat?`<span class="tag tp">${x(r.beat)}</span>`:'—'}</td>
+      <td>${r.sector?`<span class="tag ts">${x(r.sector)}</span>`:'—'}</td>
+      <td>${r.type?`<span class="tag tt">${x(r.type)}</span>`:'—'}</td>
+      <td>${r.country?`<span class="tag tc">${x(r.country)}</span>`:'—'}</td>
+      <td><div class="tags-cell">${themeTags||'—'}</div></td>
+      <td class="nt">${x(r.notes)}</td>
+      <td><div class="act-btns">
+        <button class="act-btn btn-edit" onclick="openEdit('${r.id}')">Edit</button>
+        <button class="act-btn btn-del"  onclick="confirmDel('${r.id}')">✕</button>
+      </div></td>
+    </tr>`;
+  }).join('');
 }
-const x = s => s ? s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') : '';
 
 // ═══════════════════════════════════════════════════════
-// ADD / EDIT
+// CONFERENCE FILTER + RENDER
+// ═══════════════════════════════════════════════════════
+function filteredConfs(){
+  const q=CF.search.toLowerCase();
+  return DB.conferences.filter(c=>{
+    if(CF.months.size    && !CF.months.has(c.month))       return false;
+    if(CF.audiences.size && !CF.audiences.has(c.audience)) return false;
+    if(CF.themes.size){
+      const cTags=(c.themes||'').split(',').map(t=>t.trim()).filter(Boolean);
+      if(![...CF.themes].some(ft=>cTags.includes(ft))) return false;
+    }
+    if(q&&![c.name,c.organizer,c.notes,c.audience,c.themes,c.month]
+           .some(f=>f&&f.toLowerCase().includes(q))) return false;
+    return true;
+  }).sort((a,b)=>{
+    if(!a.startDate&&!b.startDate) return 0;
+    if(!a.startDate) return 1; if(!b.startDate) return -1;
+    return new Date(a.startDate)-new Date(b.startDate);
+  });
+}
+
+function renderConf(){
+  const rows=filteredConfs();
+  document.getElementById('confMatchCount').textContent=rows.length;
+
+  const pills=document.getElementById('confActivePills'); pills.innerHTML='';
+  [...CF.months,...CF.audiences,...CF.themes].forEach(v=>{
+    const p=document.createElement('span'); p.className='pill'; p.textContent=v; pills.appendChild(p);
+  });
+  if(CF.search){ const p=document.createElement('span'); p.className='pill'; p.textContent=`"${CF.search}"`; pills.appendChild(p); }
+
+  const empty=document.getElementById('confEmptyState');
+  const tbl  =document.getElementById('confTbl');
+  if(rows.length===0){
+    empty.classList.add('on'); tbl.style.display='none';
+    document.getElementById('confEmptyTitle').textContent=DB.conferences.length===0?'No conferences yet':'No events match';
+    document.getElementById('confEmptyMsg').textContent=DB.conferences.length===0?'Click + Add Conference to log your first event.':'Try broadening your filters.';
+    return;
+  }
+  empty.classList.remove('on'); tbl.style.display='';
+
+  document.getElementById('confTbody').innerHTML=rows.map(c=>{
+    const themeTags=(c.themes||'').split(',').map(t=>t.trim()).filter(Boolean)
+      .map(t=>`<span class="tag tq">${x(t)}</span>`).join('');
+    const fmtDate=d=>{if(!d)return'—';const [y,m,dd]=d.split('-');return`${dd}/${m}/${y}`;};
+    return `<tr>
+      <td>${c.month?`<span class="tag tc">${x(c.month)}</span>`:'—'}</td>
+      <td>${fmtDate(c.startDate)}</td>
+      <td>${fmtDate(c.endDate)}</td>
+      <td class="n">${x(c.name)}</td>
+      <td>${c.audience?`<span class="tag tp">${x(c.audience)}</span>`:'—'}</td>
+      <td><div class="tags-cell">${themeTags||'—'}</div></td>
+      <td class="nt">${x(c.organizer)}</td>
+      <td><div class="act-btns">
+        <button class="act-btn btn-edit" onclick="openEditConf('${c.id}')">Edit</button>
+        <button class="act-btn btn-del"  onclick="confirmDelConf('${c.id}')">✕</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+const x=s=>s?s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'):'';
+
+// ═══════════════════════════════════════════════════════
+// REPORTER ADD / EDIT
 // ═══════════════════════════════════════════════════════
 function openAdd(){
-  editingId = null;
-  document.getElementById('addModalTitle').textContent = '+ Add Reporter';
-  document.getElementById('deleteBtn').style.display = 'none';
+  editingId=null;
+  document.getElementById('addModalTitle').textContent='+ Add Reporter';
+  document.getElementById('deleteBtn').style.display='none';
   ['name','email','outlet','notes'].forEach(f=>document.getElementById('f-'+f).value='');
-  ['sector','country','type'].forEach(f=>document.getElementById('f-'+f).value='');
+  ['tier','beat','sector','country','type'].forEach(f=>document.getElementById('f-'+f).value='');
+  reporterTags=[];
+  initTagInput('themeTagWrap','themeTagInput','f-themes',reporterTags);
   document.getElementById('addModal').classList.add('on');
   setTimeout(()=>document.getElementById('f-name').focus(),80);
 }
 function openEdit(id){
-  const r = DB.find(d=>d.id===id); if(!r) return;
-  editingId = id;
-  document.getElementById('addModalTitle').textContent = 'Edit Reporter';
-  document.getElementById('deleteBtn').style.display = '';
-  document.getElementById('deleteBtn').dataset.id = id;
+  const r=DB.reporters.find(d=>d.id===id); if(!r) return;
+  editingId=id;
+  document.getElementById('addModalTitle').textContent='Edit Reporter';
+  document.getElementById('deleteBtn').style.display='';
+  document.getElementById('deleteBtn').dataset.id=id;
   ['name','email','outlet','notes'].forEach(f=>document.getElementById('f-'+f).value=r[f]||'');
-  ['sector','country','type'].forEach(f=>document.getElementById('f-'+f).value=r[f]||'');
+  ['tier','beat','sector','country','type'].forEach(f=>document.getElementById('f-'+f).value=r[f]||'');
+  reporterTags=[];
+  loadTagsIntoInput('themeTagWrap','themeTagInput','f-themes',reporterTags,(r.themes||'').split(',').map(t=>t.trim()).filter(Boolean));
   document.getElementById('addModal').classList.add('on');
 }
 function closeAdd(){ document.getElementById('addModal').classList.remove('on'); editingId=null; }
 
 function saveReporter(){
-  const name  = document.getElementById('f-name').value.trim();
-  const email = document.getElementById('f-email').value.trim();
+  const name =document.getElementById('f-name').value.trim();
+  const email=document.getElementById('f-email').value.trim();
   if(!name||!email){ toast('Name and Email are required','e'); return; }
-  const obj = {
-    id: editingId||uid(), name, email,
+  const obj={
+    id:editingId||uid(), name, email,
     outlet:  document.getElementById('f-outlet').value.trim(),
+    tier:    document.getElementById('f-tier').value,
+    beat:    document.getElementById('f-beat').value,
     sector:  document.getElementById('f-sector').value,
     country: document.getElementById('f-country').value,
     type:    document.getElementById('f-type').value,
+    themes:  document.getElementById('f-themes').value,
     notes:   document.getElementById('f-notes').value.trim(),
   };
-  if(editingId){ const i=DB.findIndex(r=>r.id===editingId); DB[i]=obj; }
-  else DB.push(obj);
+  if(editingId){ const i=DB.reporters.findIndex(r=>r.id===editingId); DB.reporters[i]=obj; }
+  else DB.reporters.push(obj);
   scheduleSave(); closeAdd(); buildAllChips(); render();
   toast(editingId?`Updated ${name}`:`Added ${name}`,'s');
 }
 
 function confirmDel(id){
-  const r = DB.find(d=>d.id===id); if(!r) return;
-  if(confirm(`Delete ${r.name}? This cannot be undone.`)){ DB=DB.filter(d=>d.id!==id); scheduleSave(); closeAdd(); buildAllChips(); render(); toast('Reporter deleted','w'); }
+  const r=DB.reporters.find(d=>d.id===id); if(!r) return;
+  if(confirm(`Delete ${r.name}? This cannot be undone.`)){ DB.reporters=DB.reporters.filter(d=>d.id!==id); scheduleSave(); closeAdd(); buildAllChips(); render(); toast('Reporter deleted','w'); }
 }
 function deleteReporter(){ confirmDel(document.getElementById('deleteBtn').dataset.id); }
 
 // ═══════════════════════════════════════════════════════
-// BULK ADD
+// CONFERENCE ADD / EDIT
+// ═══════════════════════════════════════════════════════
+function openConf(){
+  confEditingId=null;
+  document.getElementById('confModalTitle').textContent='+ Add Conference';
+  document.getElementById('confDeleteBtn').style.display='none';
+  ['name','organizer','notes'].forEach(f=>document.getElementById('cf-'+f).value='');
+  ['start','end'].forEach(f=>document.getElementById('cf-'+f).value='');
+  document.getElementById('cf-audience').value='';
+  confTags=[];
+  initTagInput('confThemeTagWrap','confThemeTagInput','cf-themes',confTags);
+  document.getElementById('confModal').classList.add('on');
+  setTimeout(()=>document.getElementById('cf-name').focus(),80);
+}
+function openEditConf(id){
+  const c=DB.conferences.find(d=>d.id===id); if(!c) return;
+  confEditingId=id;
+  document.getElementById('confModalTitle').textContent='Edit Conference';
+  document.getElementById('confDeleteBtn').style.display='';
+  document.getElementById('confDeleteBtn').dataset.id=id;
+  document.getElementById('cf-name').value=c.name||'';
+  document.getElementById('cf-start').value=c.startDate||'';
+  document.getElementById('cf-end').value=c.endDate||'';
+  document.getElementById('cf-audience').value=c.audience||'';
+  document.getElementById('cf-organizer').value=c.organizer||'';
+  document.getElementById('cf-notes').value=c.notes||'';
+  confTags=[];
+  loadTagsIntoInput('confThemeTagWrap','confThemeTagInput','cf-themes',confTags,(c.themes||'').split(',').map(t=>t.trim()).filter(Boolean));
+  document.getElementById('confModal').classList.add('on');
+}
+function closeConf(){ document.getElementById('confModal').classList.remove('on'); confEditingId=null; }
+
+function saveConf(){
+  const name=document.getElementById('cf-name').value.trim();
+  const startDate=document.getElementById('cf-start').value;
+  if(!name||!startDate){ toast('Event Name and Start Date are required','e'); return; }
+  const month=startDate?MONTHS[new Date(startDate+' ').getMonth()]:'';
+  const obj={
+    id:confEditingId||uid(), name, startDate,
+    endDate:   document.getElementById('cf-end').value,
+    month,
+    audience:  document.getElementById('cf-audience').value,
+    organizer: document.getElementById('cf-organizer').value.trim(),
+    themes:    document.getElementById('cf-themes').value,
+    notes:     document.getElementById('cf-notes').value.trim(),
+  };
+  if(confEditingId){ const i=DB.conferences.findIndex(c=>c.id===confEditingId); DB.conferences[i]=obj; }
+  else DB.conferences.push(obj);
+  scheduleSave(); closeConf(); buildConfChips(); renderConf();
+  toast(confEditingId?`Updated ${name}`:`Added ${name}`,'s');
+}
+
+function confirmDelConf(id){
+  const c=DB.conferences.find(d=>d.id===id); if(!c) return;
+  if(confirm(`Delete "${c.name}"? This cannot be undone.`)){ DB.conferences=DB.conferences.filter(d=>d.id!==id); scheduleSave(); buildConfChips(); renderConf(); toast('Event deleted','w'); }
+}
+function deleteConf(){ confirmDelConf(document.getElementById('confDeleteBtn').dataset.id); }
+
+// ═══════════════════════════════════════════════════════
+// BULK ADD (reporters only)
 // ═══════════════════════════════════════════════════════
 function openBulk(){
   document.getElementById('bulkInput').value='';
@@ -674,26 +1027,26 @@ function openBulk(){
 function closeBulk(){ document.getElementById('bulkModal').classList.remove('on'); }
 
 function parseBulk(){
-  const raw = document.getElementById('bulkInput').value;
-  const lines = raw.split('\n').map(l=>l.trim()).filter(l=>l);
-  bulkParsed = []; const errs = [];
+  const raw=document.getElementById('bulkInput').value;
+  const lines=raw.split('\n').map(l=>l.trim()).filter(l=>l);
+  bulkParsed=[]; const errs=[];
   lines.forEach((line,i)=>{
-    const cols = line.includes('\t') ? line.split('\t') : line.split(',');
-    const [name,email,outlet,sector,country,type,...rest] = cols.map(c=>c.trim().replace(/^"|"$/g,'').trim());
-    const notes = rest.join(',').trim().replace(/^"|"$/g,'').trim();
+    const cols=line.includes('\t')?line.split('\t'):line.split(',');
+    const [name,email,outlet,tier,beat,sector,country,type,themes,...rest]=cols.map(c=>c.trim().replace(/^"|"$/g,'').trim());
+    const notes=rest.join(',').trim().replace(/^"|"$/g,'').trim();
     if(!name){ errs.push(`Row ${i+1}: missing name`); return; }
     if(!email||!email.includes('@')){ errs.push(`Row ${i+1}: invalid email for "${name}"`); return; }
-    bulkParsed.push({id:uid(),name,email,outlet:outlet||'',sector:sector||'',country:country||'',type:type||'',notes:notes||''});
+    bulkParsed.push({id:uid(),name,email,outlet:outlet||'',tier:tier||'',beat:beat||'',sector:sector||'',country:country||'',type:type||'',themes:(themes||'').replace(/;/g,','),notes:notes||''});
   });
-  const prev = document.getElementById('bulkPreview');
-  const btn  = document.getElementById('bulkSaveBtn');
+  const prev=document.getElementById('bulkPreview');
+  const btn =document.getElementById('bulkSaveBtn');
   if(!lines.length){ prev.innerHTML=''; btn.disabled=true; btn.textContent='Import 0 Reporters'; return; }
   let html='';
   if(errs.length) html+=`<div class="preview-err">⚠ ${errs.join(' · ')}</div>`;
   if(bulkParsed.length){
     html+=`<div class="preview-ok" style="margin-bottom:7px">✓ ${bulkParsed.length} reporters ready to import</div>`;
-    html+=`<table class="preview-table"><thead><tr><th>Name</th><th>Email</th><th>Outlet</th><th>Sector</th><th>Country</th><th>Type</th></tr></thead><tbody>`;
-    html+=bulkParsed.slice(0,6).map(r=>`<tr><td>${x(r.name)}</td><td>${x(r.email)}</td><td>${x(r.outlet)}</td><td>${x(r.sector)}</td><td>${x(r.country)}</td><td>${x(r.type)}</td></tr>`).join('');
+    html+=`<table class="preview-table"><thead><tr><th>Name</th><th>Email</th><th>Outlet</th><th>Tier</th><th>Beat</th><th>Themes</th></tr></thead><tbody>`;
+    html+=bulkParsed.slice(0,6).map(r=>`<tr><td>${x(r.name)}</td><td>${x(r.email)}</td><td>${x(r.outlet)}</td><td>${x(r.tier)}</td><td>${x(r.beat)}</td><td>${x(r.themes)}</td></tr>`).join('');
     if(bulkParsed.length>6) html+=`<tr><td colspan="6" style="color:var(--steel);font-size:11px;padding:6px 9px">…and ${bulkParsed.length-6} more</td></tr>`;
     html+=`</tbody></table>`;
     btn.disabled=false; btn.textContent=`Import ${bulkParsed.length} Reporter${bulkParsed.length!==1?'s':''}`;
@@ -703,88 +1056,101 @@ function parseBulk(){
 
 function saveBulk(){
   if(!bulkParsed.length) return;
-  const fresh = bulkParsed.filter(r=>!DB.some(d=>d.email.toLowerCase()===r.email.toLowerCase()));
-  const dupes  = bulkParsed.length - fresh.length;
-  DB.push(...fresh); scheduleSave(); closeBulk(); buildAllChips(); render();
+  const fresh=bulkParsed.filter(r=>!DB.reporters.some(d=>d.email.toLowerCase()===r.email.toLowerCase()));
+  const dupes=bulkParsed.length-fresh.length;
+  DB.reporters.push(...fresh); scheduleSave(); closeBulk(); buildAllChips(); render();
   let msg=`Added ${fresh.length} reporters`;
   if(dupes) msg+=` · Skipped ${dupes} duplicate${dupes>1?'s':''}`;
   toast(msg,'s');
 }
 
 // ═══════════════════════════════════════════════════════
-// EXPORT
+// CLEAR FILTERS
+// ═══════════════════════════════════════════════════════
+function clearAll(){
+  F.tiers.clear(); F.beats.clear(); F.sectors.clear(); F.countries.clear(); F.types.clear(); F.search='';
+  document.getElementById('searchInput').value='';
+  ['tierChips','beatChips','sectorChips','countryChips','typeChips'].forEach(id=>{
+    const map={tierChips:F.tiers,beatChips:F.beats,sectorChips:F.sectors,countryChips:F.countries,typeChips:F.types};
+    syncC(document.getElementById(id),map[id]);
+  });
+  render();
+}
+function clearConfAll(){
+  CF.months.clear(); CF.audiences.clear(); CF.themes.clear(); CF.search='';
+  document.getElementById('confSearchInput').value='';
+  ['confMonthChips','confAudienceChips','confThemeChips'].forEach(id=>{
+    const map={confMonthChips:CF.months,confAudienceChips:CF.audiences,confThemeChips:CF.themes};
+    syncC(document.getElementById(id),map[id]);
+  });
+  renderConf();
+}
+
+document.getElementById('searchInput').addEventListener('input',e=>{ F.search=e.target.value; render(); });
+document.getElementById('confSearchInput').addEventListener('input',e=>{ CF.search=e.target.value; renderConf(); });
+
+// ═══════════════════════════════════════════════════════
+// EXPORT — REPORTERS
 // ═══════════════════════════════════════════════════════
 function exportCSV(){
-  const rows = filtered();
+  const rows=filteredReporters();
   if(!rows.length){ toast('No reporters to export','e'); return; }
-  const h = ['Name','Email','Outlet','Sector','Country','Type','Notes'];
-  const csv=[h,...rows.map(r=>[r.name,r.email,r.outlet,r.sector,r.country,r.type,r.notes])]
+  const h=['Name','Email','Outlet','Tier','Beat','Sector','Country','Type','Themes','Notes'];
+  const csv=[h,...rows.map(r=>[r.name,r.email,r.outlet,r.tier,r.beat,r.sector,r.country,r.type,r.themes,r.notes])]
     .map(row=>row.map(v=>`"${(v||'').replace(/"/g,'""')}"`).join(',')).join('\n');
   dl(csv,'text/csv',`media_list_${today()}.csv`);
   toast(`Exported ${rows.length} reporters`,'s');
 }
 function exportAll(){
-  const h = ['Name','Email','Outlet','Sector','Country','Type','Notes'];
-  const csv=[h,...DB.map(r=>[r.name,r.email,r.outlet,r.sector,r.country,r.type,r.notes])]
+  const h=['Name','Email','Outlet','Tier','Beat','Sector','Country','Type','Themes','Notes'];
+  const csv=[h,...DB.reporters.map(r=>[r.name,r.email,r.outlet,r.tier,r.beat,r.sector,r.country,r.type,r.themes,r.notes])]
     .map(row=>row.map(v=>`"${(v||'').replace(/"/g,'""')}"`).join(',')).join('\n');
   dl(csv,'text/csv',`media_list_BACKUP_${today()}.csv`);
-  toast(`Full backup — ${DB.length} reporters`,'s');
+  toast(`Full backup — ${DB.reporters.length} reporters`,'s');
 }
 function copyForSheets(){
-  const rows = filtered();
+  const rows=filteredReporters();
   if(!rows.length){ toast('No reporters to copy','e'); return; }
-  const h = ['Name','Email','Outlet','Sector','Country','Type','Notes'];
-  const tsv=[h,...rows.map(r=>[r.name,r.email,r.outlet,r.sector,r.country,r.type,r.notes])]
+  const h=['Name','Email','Outlet','Tier','Beat','Sector','Country','Type','Themes','Notes'];
+  const tsv=[h,...rows.map(r=>[r.name,r.email,r.outlet,r.tier,r.beat,r.sector,r.country,r.type,r.themes,r.notes])]
     .map(row=>row.map(v=>v||'').join('\t')).join('\n');
   navigator.clipboard.writeText(tsv)
-    .then(()=>toast(`${rows.length} reporters copied — paste into Google Sheets with Ctrl+V / ⌘V`,'s'))
-    .catch(()=>{
-      const ta=document.createElement('textarea'); ta.value=tsv; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
-      toast(`${rows.length} reporters copied`,'s');
-    });
+    .then(()=>toast(`${rows.length} reporters copied — paste into Google Sheets`,'s'))
+    .catch(()=>{ const ta=document.createElement('textarea'); ta.value=tsv; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); toast(`${rows.length} reporters copied`,'s'); });
 }
-function dl(content,type,name){
-  const a=Object.assign(document.createElement('a'),{href:URL.createObjectURL(new Blob([content],{type})),download:name}); a.click();
+
+// ═══════════════════════════════════════════════════════
+// EXPORT — CONFERENCES
+// ═══════════════════════════════════════════════════════
+function exportConfCSV(){
+  const rows=filteredConfs();
+  if(!rows.length){ toast('No events to export','e'); return; }
+  const h=['Month','Start Date','End Date','Event Name','Audience','Themes','Organizer Contact','Notes'];
+  const csv=[h,...rows.map(c=>[c.month,c.startDate,c.endDate,c.name,c.audience,c.themes,c.organizer,c.notes])]
+    .map(row=>row.map(v=>`"${(v||'').replace(/"/g,'""')}"`).join(',')).join('\n');
+  dl(csv,'text/csv',`conferences_${today()}.csv`);
+  toast(`Exported ${rows.length} events`,'s');
 }
+function exportConfAll(){
+  const h=['Month','Start Date','End Date','Event Name','Audience','Themes','Organizer Contact','Notes'];
+  const csv=[h,...DB.conferences.map(c=>[c.month,c.startDate,c.endDate,c.name,c.audience,c.themes,c.organizer,c.notes])]
+    .map(row=>row.map(v=>`"${(v||'').replace(/"/g,'""')}"`).join(',')).join('\n');
+  dl(csv,'text/csv',`conferences_BACKUP_${today()}.csv`);
+  toast(`Backed up ${DB.conferences.length} events`,'s');
+}
+function copyConfForSheets(){
+  const rows=filteredConfs();
+  if(!rows.length){ toast('No events to copy','e'); return; }
+  const h=['Month','Start Date','End Date','Event Name','Audience','Themes','Organizer Contact','Notes'];
+  const tsv=[h,...rows.map(c=>[c.month,c.startDate,c.endDate,c.name,c.audience,c.themes,c.organizer,c.notes])]
+    .map(row=>row.map(v=>v||'').join('\t')).join('\n');
+  navigator.clipboard.writeText(tsv)
+    .then(()=>toast(`${rows.length} events copied — paste into Google Sheets`,'s'))
+    .catch(()=>{ const ta=document.createElement('textarea'); ta.value=tsv; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); toast(`${rows.length} events copied`,'s'); });
+}
+
+function dl(content,type,name){ const a=Object.assign(document.createElement('a'),{href:URL.createObjectURL(new Blob([content],{type})),download:name}); a.click(); }
 const today=()=>new Date().toISOString().slice(0,10);
-
-// ═══════════════════════════════════════════════════════
-// SETUP MODAL
-// ═══════════════════════════════════════════════════════
-function openSetup(){
-  const creds = getCreds();
-  if(creds.apiKey) document.getElementById('apiKeyInput').value = creds.apiKey;
-  document.getElementById('connStatus').textContent = '';
-  document.getElementById('setupModal').classList.add('on');
-}
-function closeSetup(){ document.getElementById('setupModal').classList.remove('on'); }
-
-// ═══════════════════════════════════════════════════════
-// CLOSE MODALS ON BACKGROUND CLICK
-// ═══════════════════════════════════════════════════════
-['addModal','bulkModal','setupModal'].forEach(id=>{
-  document.getElementById(id).addEventListener('click',e=>{
-    if(e.target===e.currentTarget){
-      if(id==='addModal') closeAdd();
-      else if(id==='bulkModal') closeBulk();
-      else closeSetup();
-    }
-  });
-});
-
-// ═══════════════════════════════════════════════════════
-// CLEAR / SEARCH
-// ═══════════════════════════════════════════════════════
-function clearAll(){
-  F.sectors.clear(); F.countries.clear(); F.types.clear(); F.search='';
-  document.getElementById('searchInput').value='';
-  ['sectorChips','countryChips','typeChips'].forEach(id=>{
-    const s=id==='sectorChips'?F.sectors:id==='countryChips'?F.countries:F.types;
-    syncC(document.getElementById(id),s);
-  });
-  render();
-}
-document.getElementById('searchInput').addEventListener('input',e=>{ F.search=e.target.value; render(); });
 
 // ═══════════════════════════════════════════════════════
 // TOAST
@@ -797,37 +1163,193 @@ function toast(msg,type=''){
 }
 
 // ═══════════════════════════════════════════════════════
-// SEED DATA (loaded on first connect)
+// SETUP MODAL
 // ═══════════════════════════════════════════════════════
-const SEED_DATA = [
-  {id:uid(),name:"James Walker",     email:"j.walker@ft.com",               outlet:"Financial Times",          sector:"Finance",    country:"UK",          type:"Publication",notes:"Senior fintech reporter"},
-  {id:uid(),name:"Sarah Chen",       email:"s.chen@bloomberg.com",          outlet:"Bloomberg",                sector:"Markets",    country:"UAE",         type:"Publication",notes:"Markets desk"},
-  {id:uid(),name:"Emma Thompson",    email:"e.thompson@bbc.co.uk",          outlet:"BBC",                      sector:"Mainstream", country:"UK",          type:"Broadcast",  notes:"Business reporter"},
-  {id:uid(),name:"Lucie Moreau",     email:"l.moreau@lesechos.fr",          outlet:"Les Echos",                sector:"Finance",    country:"France",      type:"Publication",notes:"Finance editor"},
-  {id:uid(),name:"Hans Mueller",     email:"h.mueller@handelsblatt.de",     outlet:"Handelsblatt",             sector:"Finance",    country:"Germany",     type:"Publication",notes:"FinTech desk"},
-  {id:uid(),name:"Sophie Müller",    email:"s.muller@nzz.ch",              outlet:"NZZ",                      sector:"Finance",    country:"Switzerland", type:"Publication",notes:"Swiss finance"},
-  {id:uid(),name:"Ahmed Al-Rashid",  email:"a.rashid@thenational.ae",       outlet:"The National",             sector:"Crypto",     country:"UAE",         type:"Publication",notes:"Crypto & DeFi"},
-  {id:uid(),name:"Fatima Al-Zahra",  email:"f.alzahra@arabianbusiness.com", outlet:"Arabian Business",         sector:"Finance",    country:"UAE",         type:"Magazine",   notes:"Finance & FS"},
-  {id:uid(),name:"Michael Torres",   email:"m.torres@reuters.com",          outlet:"Reuters",                  sector:"Markets",    country:"UK",          type:"Publication",notes:"FX & Crypto"},
-  {id:uid(),name:"Marc Dubois",      email:"m.dubois@coindesk.com",         outlet:"CoinDesk",                 sector:"Crypto",     country:"France",      type:"Publication",notes:"DeFi reporter"},
-  {id:uid(),name:"Yuki Tanaka",      email:"y.tanaka@cryptotimes.jp",       outlet:"Crypto Times",             sector:"Crypto",     country:"Japan",       type:"Publication",notes:"Digital assets"},
-  {id:uid(),name:"Min-jun Lee",      email:"mj.lee@koreaherald.com",        outlet:"Korea Herald",             sector:"Technology", country:"South Korea", type:"Publication",notes:"Fintech & crypto"},
-  {id:uid(),name:"Wei Lin",          email:"w.lin@straitstimes.com",        outlet:"The Straits Times",        sector:"Finance",    country:"Singapore",   type:"Publication",notes:"Finance & tech"},
-  {id:uid(),name:"Lisa Ho",          email:"l.ho@scmp.com",                 outlet:"South China Morning Post", sector:"Finance",    country:"Hong Kong",   type:"Publication",notes:"Crypto & DeFi"},
-  {id:uid(),name:"Haruto Sato",      email:"h.sato@nikkei.com",             outlet:"Nikkei",                   sector:"Finance",    country:"Japan",       type:"Publication",notes:"Finance desk"},
-  {id:uid(),name:"Nattaya Suksan",   email:"n.suksan@bangkokpost.com",       outlet:"Bangkok Post",             sector:"Business",   country:"Thailand",    type:"Publication",notes:"Fintech & finance"},
-  {id:uid(),name:"Kevin Chan",       email:"k.chan@hkfp.com",               outlet:"HKFP",                     sector:"Business",   country:"Hong Kong",   type:"Publication",notes:"Finance editor"},
-  {id:uid(),name:"Rajan Pillai",     email:"r.pillai@businesstimes.com.sg", outlet:"Business Times",           sector:"Markets",    country:"Singapore",   type:"Publication",notes:"Fintech reporter"},
-  {id:uid(),name:"Ji-yeon Kim",      email:"jy.kim@koreatimes.co.kr",       outlet:"Korea Times",              sector:"Business",   country:"South Korea", type:"Publication",notes:"Finance editor"},
-  {id:uid(),name:"Thomas Bauer",     email:"t.bauer@swissinfo.ch",          outlet:"SWI swissinfo",            sector:"Business",   country:"Switzerland", type:"Publication",notes:"Bilingual outlet"},
-  {id:uid(),name:"Clara Becker",     email:"c.becker@wirtschaftswoche.de",  outlet:"WirtschaftsWoche",         sector:"Business",   country:"Germany",     type:"Magazine",   notes:"Business mag"},
-  {id:uid(),name:"Isabelle Renard",  email:"i.renard@challenges.fr",        outlet:"Challenges",               sector:"Finance",    country:"France",      type:"Magazine",   notes:"Bi-weekly business"},
-  {id:uid(),name:"Alex Harrison",    email:"alex@blockchainpod.com",        outlet:"Blockchain Decoded",       sector:"Crypto",     country:"UK",          type:"Podcast",    notes:"~50K listeners"},
-  {id:uid(),name:"Priya Nair",       email:"priya@cryptoconvo.com",         outlet:"Crypto Conversations",     sector:"Crypto",     country:"UAE",         type:"Podcast",    notes:"DeFi focus"},
-  {id:uid(),name:"Jake Mercer",      email:"jake@fintechminutes.com",       outlet:"FinTech Minutes",          sector:"Finance",    country:"US",          type:"Podcast",    notes:"B2B audience"},
-  {id:uid(),name:"Lena Vogel",       email:"l.vogel@derstandard.at",        outlet:"Der Standard",             sector:"Technology", country:"Germany",     type:"Publication",notes:"Tech desk"},
-  {id:uid(),name:"Tom Simonite",     email:"t.simonite@wired.com",          outlet:"WIRED",                    sector:"AI",         country:"UK",          type:"Publication",notes:"AI correspondent"},
-  {id:uid(),name:"David Park",       email:"d.park@cnn.com",                outlet:"CNN",                      sector:"Mainstream", country:"UK",          type:"Broadcast",  notes:"Finance segment"},
+function openSetup(){
+  const creds=getCreds();
+  if(creds.apiKey) document.getElementById('apiKeyInput').value=creds.apiKey;
+  document.getElementById('connStatus').textContent='';
+  document.getElementById('setupModal').classList.add('on');
+}
+function closeSetup(){ document.getElementById('setupModal').classList.remove('on'); }
+
+// ═══════════════════════════════════════════════════════
+// CLOSE MODALS ON BACKGROUND CLICK
+// ═══════════════════════════════════════════════════════
+['addModal','bulkModal','setupModal','confModal'].forEach(id=>{
+  document.getElementById(id).addEventListener('click',e=>{
+    if(e.target===e.currentTarget){
+      if(id==='addModal') closeAdd();
+      else if(id==='bulkModal') closeBulk();
+      else if(id==='confModal') closeConf();
+      else closeSetup();
+    }
+  });
+});
+
+// ═══════════════════════════════════════════════════════
+// SEED DATA
+// ═══════════════════════════════════════════════════════
+const SEED_DATA=[
+  {id:uid(),name:"Zoe Kleinman",email:"zoe.kleinman@bbc.co.uk",outlet:"BBC: Future Tech",tier:"Tier 1",beat:"Markets News, Product News",themes:"AI Dev Tools, Launch News, Large Languge Model (LLM) Training, AI Infrastructure",type:"Publication",sector:'',country:'',notes:''},
+  {id:uid(),name:"Thomas Germain",email:"thomas.germain@bbc.com",outlet:"BBC: Future Tech",tier:"Tier 1",beat:"Product News, Markets News",themes:"Machine Learning, Large Languge Model (LLM) Training, AI Dev Tools",type:"Publication",sector:'',country:'',notes:''},
+  {id:uid(),name:"Ashley Capoot",email:"ashley.capoot@versantmedia.com",outlet:"CNBC",tier:"Tier 1",beat:"Product News, Funding News, Markets News",themes:"AI Infrastructure, AI Policy & Regulation, Expert Commentary, Launch News, Funding News",type:"Publication",sector:'',country:'',notes:''},
+  {id:uid(),name:"Arjun Kharpal",email:"arjun.kharpal@versantmedia.com",outlet:"CNBC",tier:"Tier 1",beat:"Markets News, Funding News, Product News",themes:"AI Policy & Regulation, AI Infrastructure, Funding News, Launch News",type:"Publication",sector:'',country:'',notes:''},
+  {id:uid(),name:"Tripp Mickle",email:"tripp.mickle@nytimes.com",outlet:"NY Times",tier:"Tier 1",beat:"Markets News, Funding News",themes:"Launch News, Funding News, AI Infrastructure, Expert Commentary, Machine Learning",type:"Publication",sector:'',country:'',notes:''},
+  {id:uid(),name:"Kashmir Hill",email:"kashmir.hill@nytimes.com",outlet:"NY Times",tier:"Tier 1",beat:"Markets News, Funding News, Product News",themes:"AI Infrastructure, Machine Learning, Launch News, AI Policy & Regulation",type:"Publication",sector:'',country:'',notes:''},
+  {id:uid(),name:"Cade Metz",email:"cade.metz@nytimes.com",outlet:"NY Times",tier:"Tier 1",beat:"Markets News, Funding News, Product News",themes:"AI Infrastructure, Machine Learning, Large Languge Model (LLM) Training, AI Applications, Funding News, Expert Commentary",type:"Publication",sector:'',country:'',notes:''},
+  {id:uid(),name:"Supantha Mukherjee",email:"supantha.mukherjee@thomsonreuters.com",outlet:"Reuters",tier:"Tier 2",beat:"Markets News, Product News",themes:"AI Policy & Regulation, AI Infrastructure, Funding News, AI Applications",type:"Publication",sector:'',country:'',notes:''},
+  {id:uid(),name:"Jeffrey Dastin",email:"jeffrey.dastin@thomsonreuters.com",outlet:"Reuters",tier:"Tier 2",beat:"Product News, Markets News, Funding News",themes:"AI Infrastructure, Machine Learning, Large Languge Model (LLM) Training, Funding News, AI Policy & Regulation",type:"Publication",sector:'',country:'',notes:''},
+  {id:uid(),name:"Thomas Maxwell",email:"tommaxwell95@gmail.com",outlet:"Business Insider",tier:"Tier 2",beat:"Markets News, Funding News",themes:"AI Applications, AI Policy & Regulation, AI Dev Tools",type:"Publication",sector:'',country:'',notes:''},
+  {id:uid(),name:"Katie Notopoulos",email:"knotopoulos@businessinsider.com",outlet:"Business Insider",tier:"Tier 2",beat:"Markets News, Funding News, Product News",themes:"AI Infrastructure, AI Applications, AI Dev Tools, AI Policy & Regulation",type:"Publication",sector:'',country:'',notes:''},
+  {id:uid(),name:"Alistair Barr",email:"abarr@businessinsider.com",outlet:"Business Insider",tier:"Tier 2",beat:"Product News, Markets News",themes:"Large Languge Model (LLM) Training, AI Applications, AI Dev Tools, Expert Commentary",type:"Publication",sector:'',country:'',notes:''},
+  {id:uid(),name:"Belle Lin",email:"belle.lin@wsj.com",outlet:"Wall Street Journal",tier:"Tier 2",beat:"Markets News, Product News, Funding News",themes:"AI Dev Tools, AI Applications, AI Infrastructure, AI Policy & Regulation, Expert Commentary, Launch News",type:"Publication",sector:'',country:'',notes:''},
+  {id:uid(),name:"Isabelle Bousquette",email:"isabelle.bousquette@wsj.com",outlet:"Wall Street Journal",tier:"Tier 2",beat:"Markets News, Funding News, Product News",themes:"Launch News, Expert Commentary, Large Languge Model (LLM) Training, Machine Learning, Funding News",type:"Publication",sector:'',country:'',notes:''},
+  {id:uid(),name:"Richard Nieva",email:"rnieva@forbes.com",outlet:"Forbes",tier:"Tier 2",beat:"Product News, Markets News, Funding News",themes:"Launch News, Funding News, AI Policy & Regulation, Machine Learning",type:"Publication",sector:'',country:'',notes:''},
+  {id:uid(),name:"Anna Tong",email:"atong@forbes.com",outlet:"Forbes",tier:"Tier 2",beat:"Markets News, Funding News",themes:"AI Infrastructure, AI Dev Tools, AI Applications, Launch News",type:"Publication",sector:'',country:'',notes:''},
+  {id:uid(),name:"Rashi Shrivastava",email:"rshrivastava@forbes.com",outlet:"Forbes",tier:"Tier 2",beat:"Markets News, Funding News, Product News",themes:"AI Infrastructure, AI Policy & Regulation, Expert Commentary, AI Dev Tools, AI Applications, Machine Learning",type:"Publication",sector:'',country:'',notes:''},
+  {id:uid(),name:"Rachel Metz",email:"rmetz17@bloomberg.net",outlet:"Bloomberg",tier:"Tier 3",beat:"Markets News, Funding News, Product News",themes:"AI Applications, AI Policy & Regulation, Expert Commentary, Machine Learning, Funding News",type:"Publication",sector:'',country:'',notes:''},
+  {id:uid(),name:"Shirin Ghaffary",email:"sghaffary@bloomberg.net",outlet:"Bloomberg",tier:"Tier 3",beat:"Markets News, Funding News, Product News",themes:"AI Infrastructure, Large Languge Model (LLM) Training, AI Policy & Regulation",type:"Publication",sector:'',country:'',notes:''},
+  {id:uid(),name:"Ina Fried",email:"ina@axios.com",outlet:"Axios",tier:"Tier 3",beat:"Funding News, Markets News, Product News",themes:"AI Policy & Regulation, Machine Learning, AI Infrastructure, Launch News, Funding News",type:"Publication",sector:'',country:'',notes:''},
+  {id:uid(),name:"Megan Morrone",email:"megan.morrone@axios.com",outlet:"Axios",tier:"Tier 3",beat:"Markets News, Funding News, Product News",themes:"Machine Learning, AI Infrastructure, Large Languge Model (LLM) Training, AI Dev Tools, Launch News, Expert Commentary",type:"Publication",sector:'',country:'',notes:''},
+  {id:uid(),name:"Maria Curi",email:"maria.curi@axios.com",outlet:"Axios",tier:"Tier 3",beat:"Product News, Markets News, Funding News",themes:"AI Infrastructure, Machine Learning, Large Languge Model (LLM) Training, AI Applications, Expert Commentary, Launch News",type:"Publication",sector:'',country:'',notes:''},
+  {id:uid(),name:"Madhumita Murgia",email:"madhumita.murgia@ft.com",outlet:"Financial Times",tier:"Tier 3",beat:"Funding News, Markets News, Product News",themes:"Launch News, AI Dev Tools, Expert Commentary, AI Policy & Regulation",type:"Publication",sector:'',country:'',notes:''},
+  {id:uid(),name:"Melissa Heikkilä",email:"melissa.heikkila@ft.com",outlet:"Financial Times",tier:"Tier 3",beat:"Markets News, Funding News, Product News",themes:"Machine Learning, AI Applications, Large Languge Model (LLM) Training, AI Infrastructure",type:"Publication",sector:'',country:'',notes:''},
+  {id:uid(),name:"Cristina Criddle",email:"cristina.criddle@ft.com",outlet:"Financial Times",tier:"Tier 3",beat:"Funding News, Markets News, Product News",themes:"AI Policy & Regulation, Expert Commentary, AI Infrastructure, Large Languge Model (LLM) Training",type:"Publication",sector:'',country:'',notes:''},
+  {id:uid(),name:"Beatrice Nolan",email:"bea.nolan@fortune.com",outlet:"Fortune",tier:"Tier 3",beat:"Funding News, Product News, Markets News",themes:"AI Infrastructure, Launch News, AI Applications, AI Policy & Regulation",type:"Publication",sector:'',country:'',notes:''},
+  {id:uid(),name:"Sharon Goldman",email:"sharon.goldman@fortune.com",outlet:"Fortune",tier:"Tier 3",beat:"Product News, Markets News, Funding News",themes:"Expert Commentary, Machine Learning, Large Languge Model (LLM) Training, Funding News, AI Dev Tools",type:"Publication",sector:'',country:'',notes:''},
+  {id:uid(),name:"Britney Nguyen",email:"britney.nguyen@marketwatch.com",outlet:"Marketwatch",tier:"Tier 3",beat:"Markets News",themes:"AI Policy & Regulation, AI Infrastructure",type:"Publication",sector:'',country:'',notes:''},
+  {id:uid(),name:"Laila Maidan",email:"laila.maidan@marketwatch.com",outlet:"Marketwatch",tier:"Tier 3",beat:"Markets News",themes:"AI Infrastructure, Expert Commentary",type:"Publication",sector:'',country:'',notes:''},
+  {id:uid(),name:"Jon Reed",email:"joreed@cnet.com",outlet:"CNET",tier:"Tier 1",beat:"Markets News, Product News",themes:"AI Policy & Regulation, Machine Learning, Large Languge Model (LLM) Training, AI Applications, AI Dev Tools",type:"Publication",sector:'',country:'',notes:''},
+  {id:uid(),name:"Macy Meyer",email:"mmeyer@cnet.com",outlet:"CNET",tier:"Tier 1",beat:"Markets News, Funding News, Product News",themes:"AI Infrastructure, Large Languge Model (LLM) Training, AI Dev Tools, Funding News",type:"Publication",sector:'',country:'',notes:''},
+  {id:uid(),name:"Katelyn Chedraoui",email:"kchedraoui@cnet.com",outlet:"CNET",tier:"Tier 1",beat:"Product News, Markets News",themes:"AI Infrastructure, Machine Learning, AI Dev Tools, Expert Commentary",type:"Publication",sector:'',country:'',notes:''},
+  {id:uid(),name:"Graham Barlow",email:"graham.barlow@futurenet.com",outlet:"TechRadar",tier:"Tier 1",beat:"Markets News, Funding News, Product News",themes:"Machine Learning, AI Applications, AI Dev Tools, Expert Commentary",type:"Publication",sector:'',country:'',notes:''},
+  {id:uid(),name:"John-Anthony Disotto",email:"john-anthony.disotto@futurenet.com",outlet:"TechRadar",tier:"Tier 1",beat:"Product News, Markets News",themes:"AI Applications, AI Dev Tools, Launch News, Funding News",type:"Publication",sector:'',country:'',notes:''},
+  {id:uid(),name:"Cecily Mauran",email:"cecily.mauran@mashable.com",outlet:"Mashable",tier:"Tier 2",beat:"Product News, Markets News, Funding News",themes:"Launch News, Funding News, AI Dev Tools, Large Languge Model (LLM) Training, AI Infrastructure",type:"Publication",sector:'',country:'',notes:''},
+  {id:uid(),name:"Chance Townsend",email:"chance.townsend@ziffmedia.com",outlet:"Mashable",tier:"Tier 2",beat:"Funding News, Markets News, Product News",themes:"AI Applications, Funding News, AI Policy & Regulation, Launch News, Expert Commentary, AI Infrastructure",type:"Publication",sector:'',country:'',notes:''},
+  {id:uid(),name:"Hayden Field",email:"hayden.field@theverge.com",outlet:"The Verge",tier:"Tier 2",beat:"Markets News, Funding News",themes:"AI Applications, Funding News, AI Policy & Regulation, Machine Learning",type:"Publication",sector:'',country:'',notes:''},
+  {id:uid(),name:"Robert Hart",email:"robert.hart@theverge.com",outlet:"The Verge",tier:"Tier 2",beat:"Funding News, Markets News, Product News",themes:"AI Infrastructure, Funding News, Launch News, AI Dev Tools, AI Applications",type:"Publication",sector:'',country:'',notes:''},
+  {id:uid(),name:"Lily Hay Newman",email:"lily_newman@wired.com",outlet:"Wired",tier:"Tier 2",beat:"Product News, Markets News",themes:"AI Applications, AI Policy & Regulation, AI Infrastructure",type:"Publication",sector:'',country:'',notes:''},
+  {id:uid(),name:"Benj Edwards",email:"benj.edwards@arstechnica.com",outlet:"ArsTechnica",tier:"Tier 3",beat:"Funding News, Markets News",themes:"AI Policy & Regulation, AI Infrastructure, AI Applications, Funding News",type:"Publication",sector:'',country:'',notes:''},
+  {id:uid(),name:"Dan Goodin",email:"dan.goodin@arstechnica.com",outlet:"ArsTechnica",tier:"Tier 3",beat:"Funding News, Markets News, Product News",themes:"Large Languge Model (LLM) Training, Launch News, AI Applications",type:"Publication",sector:'',country:'',notes:''},
+  {id:uid(),name:"Rebecca Bellan",email:"rebecca.bellan@techcrunch.com",outlet:"TechCrunch",tier:"Tier 3",beat:"Funding News",themes:"Funding News, Launch News",type:"Publication",sector:'',country:'',notes:''},
+  {id:uid(),name:"Russell Brandon",email:"russell.brandom@techcrunch.com",outlet:"TechCrunch",tier:"Tier 3",beat:"Product News, Markets News",themes:"AI Infrastructure, Large Languge Model (LLM) Training, AI Dev Tools",type:"Publication",sector:'',country:'',notes:''},
+  {id:uid(),name:"Harry McCracken",email:"hmccracken@fastcompany.com",outlet:"Fast Co",tier:"Tier 3",beat:"Product News, Funding News, Markets News",themes:"AI Infrastructure, Machine Learning, Funding News, AI Dev Tools",type:"Publication",sector:'',country:'',notes:''},
+  {id:uid(),name:"Mark Sullivan",email:"sullivan@fastcompany.com",outlet:"Fast Co",tier:"Tier 3",beat:"Funding News, Product News",themes:"Expert Commentary, Launch News, Funding News",type:"Publication",sector:'',country:'',notes:''},
+  {id:uid(),name:"Jacob Roach",email:"jacob.roach@digitaltrends.com",outlet:"Digital Trends",tier:"",beat:"Product News",themes:"AI Applications, AI Dev Tools",type:"Publication",sector:'',country:'',notes:''},
+  {id:uid(),name:"Eric Avidon",email:"eavidon@techtarget.com",outlet:"TechTarget",tier:"",beat:"Funding News, Markets News",themes:"Expert Commentary, Launch News, Funding News",type:"Publication",sector:'',country:'',notes:''},
+  {id:uid(),name:"Michael Nuñez",email:"michael.nunez@venturebeat.com",outlet:"VentureBeat",tier:"",beat:"Product News, Funding News",themes:"AI Infrastructure, AI Applications, Funding News",type:"Publication",sector:'',country:'',notes:''},
+  {id:uid(),name:"Sean Michael Kerner",email:"pitch@technologyjournalist.com",outlet:"VentureBeat",tier:"",beat:"Markets News, Product News",themes:"AI Applications, Machine Learning, AI Infrastructure, AI Dev Tools",type:"Publication",sector:'',country:'',notes:''},
+  {id:uid(),name:"Paul Gillin",email:"paul@siliconangle.com",outlet:"Silicon Angle",tier:"",beat:"Product News, Funding News, Markets News",themes:"AI Infrastructure, Funding News, AI Applications, Launch News",type:"Publication",sector:'',country:'',notes:''},
+  {id:uid(),name:"Mike Wheatley",email:"Mike@SiliconANGLE.com",outlet:"Silicon Angle",tier:"",beat:"Markets News, Product News, Funding News",themes:"AI Infrastructure, AI Dev Tools, Funding News, Machine Learning, Expert Commentary",type:"Publication",sector:'',country:'',notes:''},
+  {id:uid(),name:"Duncan Riley",email:"duncan@siliconangle.com",outlet:"Silicon Angle",tier:"",beat:"Product News, Funding News, Markets News",themes:"AI Infrastructure, Machine Learning, Funding News, AI Dev Tools",type:"Publication",sector:'',country:'',notes:''},
+  {id:uid(),name:"Richard MacManus",email:"richard@thenewstack.io",outlet:"The New Stack",tier:"Tier 3",beat:"Funding News, Markets News, Product News",themes:"AI Infrastructure, Machine Learning, AI Applications, Expert Commentary",type:"Publication",sector:'',country:'',notes:''},
+  {id:uid(),name:"Matthew Finnegan",email:"matthew_finnegan@foundryco.com",outlet:"Computerworld",tier:"",beat:"Product News, Funding News",themes:"Funding News, AI Dev Tools, Launch News",type:"Publication",sector:'',country:'',notes:''},
+  {id:uid(),name:"Micheal Chukwube",email:"chukwubemicheal@gmail.com",outlet:"DZone",tier:"",beat:"Product News, Funding News",themes:"AI Infrastructure, AI Dev Tools, Launch News, Funding News",type:"Publication",sector:'',country:'',notes:''},
+  {id:uid(),name:"Bobur Umurzokov",email:"iamboburdevrel@gmail.com",outlet:"DZone",tier:"",beat:"Product News, Markets News",themes:"Machine Learning, AI Infrastructure, Large Languge Model (LLM) Training, AI Dev Tools",type:"Publication",sector:'',country:'',notes:''},
+  {id:uid(),name:"M. Nadia Vincent",email:"nvincent@digitaltransformationleaders.com",outlet:"InfoQ",tier:"",beat:"Markets News",themes:"Expert Commentary, AI Infrastructure",type:"Publication",sector:'',country:'',notes:''},
+  {id:uid(),name:"Serdar Yegulalp",email:"serdar_yegulalp@foundryco.com",outlet:"InfoWorld",tier:"",beat:"Product News, Funding News",themes:"Launch News, Funding News, Large Languge Model (LLM) Training, Machine Learning",type:"Publication",sector:'',country:'',notes:''},
+  {id:uid(),name:"Ashok Goel",email:"goel@cc.gatech.edu",outlet:"AI Magazine",tier:"",beat:"Markets News, Product News, Funding News",themes:"Machine Learning, Large Languge Model (LLM) Training, AI Applications, Funding News, AI Policy & Regulation, Expert Commentary, Launch News",type:"Publication",sector:'',country:'',notes:''},
+  {id:uid(),name:"Tim King",email:"tking@solutionsreview.com",outlet:"Solutions Review",tier:"",beat:"Markets News, Funding News, Product News",themes:"Machine Learning, AI Applications, Funding News, Expert Commentary, AI Policy & Regulation",type:"Publication",sector:'',country:'',notes:''},
+  {id:uid(),name:"Isaac Sacolick",email:"isaac@starcio.com",outlet:"CIO Dive",tier:"",beat:"Product News, Funding News, Markets News",themes:"AI Infrastructure, Large Languge Model (LLM) Training, Launch News, AI Dev Tools, Funding News",type:"Publication",sector:'',country:'',notes:''},
+  {id:uid(),name:"Kyle Wiggers",email:"kylew@allenai.org",outlet:"TechCrunch Newsletter",tier:"Tier 1",beat:"Funding News, Markets News",themes:"Funding News, Launch News, AI Infrastructure",type:"Newsletter",sector:'',country:'',notes:''},
+  {id:uid(),name:"Amanda Silberling",email:"amanda@techcrunch.com",outlet:"TechCrunch Newsletter",tier:"Tier 1",beat:"Funding News, Markets News",themes:"Funding News, Launch News",type:"Newsletter",sector:'',country:'',notes:''},
+  {id:uid(),name:"Sarah Perez",email:"sarahp@techcrunch.com",outlet:"TechCrunch Newsletter",tier:"Tier 1",beat:"Funding News, Markets News",themes:"Launch News, Funding News, AI Policy & Regulation",type:"Newsletter",sector:'',country:'',notes:''},
+  {id:uid(),name:"Dylan Patel",email:"Dsp@SemiAnalysis.com",outlet:"Semianalysis Newsletter",tier:"Tier 1",beat:"Product News, Markets News",themes:"AI Applications, AI Policy & Regulation, Machine Learning",type:"Newsletter",sector:'',country:'',notes:''},
+  {id:uid(),name:"Ben Tossell",email:"ben.tossell@gmail.com",outlet:"Ben Bites",tier:"Tier 1",beat:"Product News, Markets News",themes:"AI Dev Tools, AI Applications, Large Languge Model (LLM) Training, Machine Learning",type:"Newsletter",sector:'',country:'',notes:''},
+  {id:uid(),name:"Zach Mink",email:"zach@therundown.ai",outlet:"The Rundown AI",tier:"Tier 1",beat:"Product News, Markets News, Funding News",themes:"AI Dev Tools, AI Applications, Launch News, Expert Commentary, AI Infrastructure",type:"Newsletter",sector:'',country:'',notes:''},
+  {id:uid(),name:"Rowan Cheung",email:"rowan@therundown.ai",outlet:"The Rundown AI",tier:"Tier 1",beat:"Product News, Markets News, Funding News",themes:"AI Infrastructure, AI Applications, Funding News, Launch News",type:"Newsletter",sector:'',country:'',notes:''},
+  {id:uid(),name:"Zain Kahn",email:"zain@superhuman.ai",outlet:"Superhuman AI",tier:"Tier 1",beat:"Funding News, Markets News, Product News",themes:"Funding News, AI Applications, Large Languge Model (LLM) Training, Machine Learning, AI Infrastructure, Expert Commentary",type:"Newsletter",sector:'',country:'',notes:''},
+  {id:uid(),name:"Staff",email:"hello@tldr.tech",outlet:"TLDR AI",tier:"Tier 1",beat:"Product News, Markets News, Funding News",themes:"AI Infrastructure, Machine Learning, AI Applications, Large Languge Model (LLM) Training, Launch News, Funding News, AI Dev Tools",type:"Newsletter",sector:'',country:'',notes:''},
+  {id:uid(),name:"Info Desk",email:"info@cbinsights.com",outlet:"CB Insights",tier:"Tier 1",beat:"Markets News, Funding News",themes:"Funding News, Launch News, AI Policy & Regulation, AI Advancements",type:"Newsletter",sector:'',country:'',notes:''},
+  {id:uid(),name:"Marija Gavrilov",email:"marija@exponentialview.co",outlet:"Exponential View",tier:"Tier 2",beat:"Funding News, Markets News, Product News",themes:"AI Applications, Machine Learning, AI Infrastructure, Expert Commentary",type:"Newsletter",sector:'',country:'',notes:''},
+  {id:uid(),name:"Azeem Azhar",email:"azeem.azhar@exponentialview.co",outlet:"Exponential View",tier:"Tier 2",beat:"Product News, Markets News",themes:"AI Infrastructure, Large Languge Model (LLM) Training, AI Applications, Launch News",type:"Newsletter",sector:'',country:'',notes:''},
+  {id:uid(),name:"Sebastian Raschka",email:"mail@sebastianraschka.com",outlet:"Ahead of AI",tier:"Tier 2",beat:"Product News, Markets News",themes:"AI Applications, Large Languge Model (LLM) Training, Machine Learning, AI Dev Tools",type:"Newsletter",sector:'',country:'',notes:''},
+  {id:uid(),name:"Jack Clark",email:"jack@jack-clark.net",outlet:"ImportAI",tier:"Tier 3",beat:"Product News, Markets News",themes:"AI Applications, AI Dev Tools, Machine Learning, AI Infrastructure",type:"Newsletter",sector:'',country:'',notes:''},
+  {id:uid(),name:"News Desk",email:"crew@morningbrew.com",outlet:"Tech Brew",tier:"",beat:"Markets News",themes:"AI Infrastructure, AI Advancements",type:"Newsletter",sector:'',country:'',notes:''},
+  {id:uid(),name:"Patrick Kulp",email:"pkulp@morningbrew.com",outlet:"Tech Brew",tier:"",beat:"Funding News, Markets News",themes:"Funding News, AI Applications, Machine Learning",type:"Newsletter",sector:'',country:'',notes:''},
+  {id:uid(),name:"Margarita Noriega",email:"margarita@morningbrew.com",outlet:"Tech Brew",tier:"",beat:"Funding News, Markets News",themes:"Funding News, Launch News",type:"Newsletter",sector:'',country:'',notes:''},
+  {id:uid(),name:"Annie Saunders",email:"annie@morningbrew.com",outlet:"Tech Brew",tier:"",beat:"Funding News, Markets News",themes:"Funding News, Launch News",type:"Newsletter",sector:'',country:'',notes:''},
+  {id:uid(),name:"John Desmond",email:"jdesmond@capenews.net",outlet:"AI in Business",tier:"",beat:"Markets News, Funding News",themes:"AI Infrastructure, Expert Commentary, AI Policy & Regulation",type:"Newsletter",sector:'',country:'',notes:''},
+  {id:uid(),name:"Andrey Kurenkov",email:"andreyvkurenkov@gmail.com",outlet:"Last Week in AI",tier:"",beat:"Markets News, Product News, Funding News",themes:"AI Infrastructure, AI Applications, AI Policy & Regulation",type:"Newsletter",sector:'',country:'',notes:''},
+  {id:uid(),name:"Rashi Shrivastava",email:"rshrivastava@forbes.com",outlet:"The Prompt",tier:"",beat:"Funding News, Markets News",themes:"AI Infrastructure, AI Advancements",type:"Newsletter",sector:'',country:'',notes:''},
+  {id:uid(),name:"Cory Weinberg",email:"cory@theinformation.com",outlet:"Dealmaker",tier:"",beat:"Funding News, Markets News",themes:"AI Infrastructure, AI Advancements",type:"Newsletter",sector:'',country:'',notes:''},
+  {id:uid(),name:"Natasha Mascarenhas",email:"nkmasc@gmail.com",outlet:"Dealmaker",tier:"",beat:"Funding News, Markets News",themes:"AI Infrastructure, AI Advancements",type:"Newsletter",sector:'',country:'',notes:''},
+  {id:uid(),name:"Connie Loizos",email:"connie@strictlyvc.com",outlet:"StrictlyVC",tier:"",beat:"Markets News, Funding News",themes:"Funding News",type:"Newsletter",sector:'',country:'',notes:''},
+  {id:uid(),name:"Support Desk",email:"support@datadrivenvc.io",outlet:"Data Driven VC",tier:"",beat:"Markets News, Funding News, Product News",themes:"Funding News, AI Infrastructure",type:"Newsletter",sector:'',country:'',notes:''},
+  {id:uid(),name:"Ron Schmelzer",email:"ron@cognilytica.com",outlet:"AI Today Podcast",tier:"Tier 1",beat:"Markets News, Funding News",themes:"AI Infrastructure, Funding News, AI Policy & Regulation, Expert Commentary",type:"Podcast",sector:'',country:'',notes:''},
+  {id:uid(),name:"Jack Rhysider",email:"jack@darknetdiaries.com",outlet:"Darknet Diaries",tier:"Tier 1",beat:"Markets News, Funding News, Product News",themes:"AI Applications, Funding News, AI Infrastructure",type:"Podcast",sector:'',country:'',notes:''},
+  {id:uid(),name:"Nilay Patel",email:"nilay@theverge.com",outlet:"Decoder / The Verge",tier:"Tier 1",beat:"Markets News, Funding News, Product News",themes:"AI Applications, AI Dev Tools, Funding News, Large Languge Model (LLM) Training, Machine Learning, AI Policy & Regulation",type:"Podcast",sector:'',country:'',notes:''},
+  {id:uid(),name:"Andrew Marino",email:"andrew.marino@theverge.com",outlet:"The Vergecast",tier:"Tier 1",beat:"Markets News, Product News, Funding News",themes:"AI Applications, AI Policy & Regulation, Launch News, AI Infrastructure",type:"Podcast",sector:'',country:'',notes:''},
+  {id:uid(),name:"Allison Ryder",email:"amryder@mit.edu",outlet:"Me, Myself & AI",tier:"Tier 1",beat:"Product News, Markets News, Funding News",themes:"Machine Learning, Large Languge Model (LLM) Training, AI Dev Tools, Expert Commentary",type:"Podcast",sector:'',country:'',notes:''},
+  {id:uid(),name:"Sam Ransbotham",email:"sam.ransbotham@bc.edu",outlet:"Me, Myself & AI",tier:"Tier 1",beat:"Product News, Markets News, Funding News",themes:"AI Infrastructure, Machine Learning, Launch News, AI Applications, AI Dev Tools",type:"Podcast",sector:'',country:'',notes:''},
+  {id:uid(),name:"Steve Gibson",email:"SecurityNow@grc.com",outlet:"Security Now",tier:"Tier 1",beat:"Product News, Markets News",themes:"Machine Learning, AI Infrastructure, AI Policy & Regulation",type:"Podcast",sector:'',country:'',notes:''},
+  {id:uid(),name:"Noah Kravitz",email:"noah.kravitz@gmail.com",outlet:"NVIDIA AI Podcast",tier:"Tier 2",beat:"Markets News, Funding News",themes:"Machine Learning, AI Infrastructure, Expert Commentary, AI Applications",type:"Podcast",sector:'',country:'',notes:''},
+  {id:uid(),name:"Lee Atchison",email:"lee@atchisontechnology.com",outlet:"Software Engineering Daily",tier:"Tier 3",beat:"Product News, Funding News, Markets News",themes:"Machine Learning, AI Infrastructure, Expert Commentary, Funding News, AI Dev Tools",type:"Podcast",sector:'',country:'',notes:''},
+  {id:uid(),name:"Shawn Wang",email:"swyx@swyx.io",outlet:"Latent Space",tier:"Tier 3",beat:"Markets News, Funding News",themes:"AI Infrastructure, AI Policy & Regulation, Launch News, Funding News",type:"Podcast",sector:'',country:'',notes:''},
+  {id:uid(),name:"Sam Charrington",email:"sam@twimlai.com",outlet:"The TWIML AI Podcast",tier:"Tier 3",beat:"Product News, Funding News, Markets News",themes:"AI Infrastructure, Machine Learning, Funding News, AI Applications, AI Policy & Regulation",type:"Podcast",sector:'',country:'',notes:''},
+  {id:uid(),name:"Jon Krohn",email:"now@jonkrohn.com",outlet:"Super Data Science: ML & AI",tier:"Tier 3",beat:"Markets News, Product News, Funding News",themes:"Expert Commentary, Launch News, AI Dev Tools, AI Applications, Machine Learning, AI Infrastructure",type:"Podcast",sector:'',country:'',notes:''},
+  {id:uid(),name:"Nathaniel Whittemore",email:"nlw@whittemore.io",outlet:"The AI Breakdown",tier:"",beat:"Markets News, Funding News, Product News",themes:"Launch News, Machine Learning",type:"Podcast",sector:'',country:'',notes:''},
+  {id:uid(),name:"Paul Roetzer",email:"paul@readynorth.com",outlet:"The Artificial Intelligence Show",tier:"",beat:"Product News, Markets News, Funding News",themes:"AI Applications, Machine Learning, AI Infrastructure, Expert Commentary",type:"Podcast",sector:'',country:'',notes:''},
+  {id:uid(),name:"Daniel Bashir",email:"editor@thegradient.pub",outlet:"The Gradient Podcast",tier:"",beat:"Markets News, Funding News, Product News",themes:"Machine Learning, AI Infrastructure, Funding News, AI Applications, AI Dev Tools, Launch News",type:"Podcast",sector:'',country:'',notes:''},
+  {id:uid(),name:"Anil Das-Gupta",email:"anil@naavik.co",outlet:"Deconstructor of Fun",tier:"",beat:"Product News, Markets News, Funding News",themes:"Large Languge Model (LLM) Training, Machine Learning",type:"Podcast",sector:'',country:'',notes:''},
+  {id:uid(),name:"Ryan Sean Adams",email:"ryan@banklesshq.com",outlet:"Bankless",tier:"",beat:"Product News, Markets News, Funding News",themes:"Launch News, Expert Commentary, Machine Learning",type:"Podcast",sector:'',country:'',notes:''},
+  {id:uid(),name:"Sebastien Couture",email:"sebastien@epicenter.tv",outlet:"Epicenter",tier:"",beat:"Markets News, Funding News, Product News",themes:"AI Policy & Regulation, AI Dev Tools, AI Applications, Machine Learning, Large Languge Model (LLM) Training",type:"Podcast",sector:'',country:'',notes:''},
+  {id:uid(),name:"Cleo Abram",email:"cleo@hugeiftrueshow.com",outlet:"Big Technology Podcast",tier:"",beat:"Markets News",themes:"AI Infrastructure, AI Policy & Regulation, AI Applications",type:"Podcast",sector:'',country:'',notes:''},
+  {id:uid(),name:"Tim Scarfe",email:"freelancers@mlst.ai",outlet:"Machine Learning Street Talk",tier:"",beat:"Markets News, Funding News, Product News",themes:"AI Applications, Funding News, Machine Learning, AI Infrastructure, Large Languge Model (LLM) Training",type:"Podcast",sector:'',country:'',notes:''},
+  {id:uid(),name:"Jerod Santo",email:"jerod.santo@gmail.com",outlet:"Practical AI",tier:"",beat:"Product News, Markets News",themes:"AI Policy & Regulation, AI Infrastructure, Machine Learning",type:"Podcast",sector:'',country:'',notes:''},
+  {id:uid(),name:"Scott Wapner",email:"scott.wapner@versantmedia.com",outlet:"CNBC Closing Bell",tier:"Tier 3",beat:"Markets News, Funding News",themes:"AI Infrastructure, Launch News, AI Policy & Regulation",type:"Broadcast",sector:'',country:'',notes:''},
+  {id:uid(),name:"Donna Burton",email:"donna.burton@versantmedia.com",outlet:"CNBC Closing Bell",tier:"Tier 3",beat:"Markets News",themes:"AI Infrastructure, AI Policy & Regulation",type:"Broadcast",sector:'',country:'',notes:''},
+  {id:uid(),name:"Andrew Ross Sorkin",email:"arsorkin@nytimes.com",outlet:"CNBC Squawk Box",tier:"Tier 3",beat:"Funding News, Markets News, Product News",themes:"Expert Commentary, AI Infrastructure, Funding News, Machine Learning",type:"Broadcast",sector:'',country:'',notes:''},
+  {id:uid(),name:"Rebecca Quick",email:"rebecca.quick@versantmedia.com",outlet:"CNBC Squawk Box",tier:"Tier 3",beat:"Markets News, Funding News",themes:"AI Infrastructure, Expert Commentary, AI Policy & Regulation",type:"Broadcast",sector:'',country:'',notes:''},
+  {id:uid(),name:"Seth Fiegerman",email:"sfiegerman@bloomberg.net",outlet:"Bloomberg Tech",tier:"",beat:"Markets News, Funding News, Product News",themes:"Machine Learning, AI Dev Tools, Expert Commentary, Large Languge Model (LLM) Training, Funding News",type:"Broadcast",sector:'',country:'',notes:''},
+  {id:uid(),name:"Mackenzie Hawkins",email:"mhawkins71@bloomberg.net",outlet:"Bloomberg Tech Asia",tier:"",beat:"Markets News",themes:"AI Infrastructure, Expert Commentary",type:"Broadcast",sector:'',country:'',notes:''},
+  {id:uid(),name:"Tom Mackenzie",email:"tmackenzie5@bloomberg.net",outlet:"Bloomberg Tech Europe",tier:"",beat:"Markets News",themes:"AI Infrastructure, AI Policy & Regulation",type:"Broadcast",sector:'',country:'',notes:''},
+  {id:uid(),name:"Maria Boden",email:"maria.boden@versantmedia.com",outlet:"CNBC Tech Check",tier:"",beat:"Markets News",themes:"AI Infrastructure, Expert Commentary, AI Policy & Regulation",type:"Broadcast",sector:'',country:'',notes:''},
+  {id:uid(),name:"Deirdre Bosa",email:"deirdre.bosa@versantmedia.com",outlet:"CNBC Tech Check",tier:"",beat:"Markets News, Funding News, Product News",themes:"AI Infrastructure, AI Policy & Regulation, Launch News, Machine Learning",type:"Broadcast",sector:'',country:'',notes:''},
+  {id:uid(),name:"Judy Khan Shaw",email:"judy.shaw@nyse.com",outlet:"NYSE Live",tier:"",beat:"Markets News, Product News, Funding News",themes:"AI Infrastructure, AI Policy & Regulation",type:"Broadcast",sector:'',country:'',notes:''},
+  {id:uid(),name:"Kristen Scholer",email:"kristen.scholer@ice.com",outlet:"NYSE Live",tier:"",beat:"Markets News",themes:"AI Infrastructure, AI Policy & Regulation",type:"Broadcast",sector:'',country:'',notes:''},
+  {id:uid(),name:"Maria Bartiromo",email:"maria.bartiromo@fox.com",outlet:"FOX Business Mornings with Maria",tier:"",beat:"Markets News",themes:"AI Policy & Regulation, Expert Commentary",type:"Broadcast",sector:'',country:'',notes:''},
+  {id:uid(),name:"Sarah Caulfield",email:"sarah@foxbusiness.com",outlet:"FOX Business Mornings with Maria",tier:"",beat:"Markets News",themes:"Expert Commentary, AI Infrastructure",type:"Broadcast",sector:'',country:'',notes:''},
+  {id:uid(),name:"Stuart Varney",email:"stuart.varney@foxbusiness.com",outlet:"FOX Varney & Co",tier:"",beat:"Markets News, Funding News",themes:"AI Infrastructure, AI Policy & Regulation, Expert Commentary",type:"Broadcast",sector:'',country:'',notes:''},
+  {id:uid(),name:"Garrett Collins",email:"garrett.collins@foxbusiness.com",outlet:"FOX Varney & Co",tier:"",beat:"Markets News, Funding News",themes:"AI Infrastructure, AI Policy & Regulation, Expert Commentary",type:"Broadcast",sector:'',country:'',notes:''},
+  {id:uid(),name:"Jill Malandrino",email:"jill.malandrino@nasdaq.com",outlet:"NASDAQ Trade Talks",tier:"Tier 1",beat:"Markets News, Funding News",themes:"AI Infrastructure, AI Policy & Regulation, Expert Commentary",type:"Broadcast",sector:'',country:'',notes:''},
+  {id:uid(),name:"Nikolai Kuznetsov",email:"nikolai.kuznetsov@nasdaq.com",outlet:"NASDAQ Trade Talks",tier:"Tier 1",beat:"Markets News, Funding News",themes:"AI Infrastructure, Launch News, Funding News",type:"Broadcast",sector:'',country:'',notes:''},
+  {id:uid(),name:"Michael Liedtke",email:"mliedtke@ap.org",outlet:"Cheddar TV",tier:"",beat:"Markets News, Funding News",themes:"AI Dev Tools, Launch News, Expert Commentary, Large Languge Model (LLM) Training, Machine Learning",type:"Broadcast",sector:'',country:'',notes:''},
+  {id:uid(),name:"Matt O'Brien",email:"mobrien@ap.org",outlet:"Cheddar TV",tier:"",beat:"Product News, Markets News, Funding News",themes:"AI Infrastructure, Machine Learning",type:"Broadcast",sector:'',country:'',notes:''},
+  {id:uid(),name:"Kelvin Chan",email:"kchan@ap.org",outlet:"Cheddar TV",tier:"",beat:"Markets News, Funding News",themes:"Machine Learning, Large Languge Model (LLM) Training, Launch News, AI Dev Tools",type:"Broadcast",sector:'',country:'',notes:''},
+];
+
+const SEED_CONFERENCES=[
+  {id:uid(),name:"CES (Consumer Electronics Show)",month:"January",startDate:"2026-01-06",endDate:"2026-01-09",audience:"Developers, Investors, Enterprises",themes:"AI Infrastructure, AI Applications",organizer:"CES (no specific contact provided) — media@cta.tech",notes:"Speakers: Jason Calacanis (Internet Entrepreneur), Bob Sternfels (Global Managing Partner at McKinsey & Company) - full list here"},
+  {id:uid(),name:"AAAI",month:"January",startDate:"2026-01-20",endDate:"2026-01-27",audience:"Developers, Enterprises, Investors",themes:"AI Infrastructure, AI Applications, Agentic AI",organizer:"The Association for the Advancement of Artificial Intelligence (did not see specific contact) — aaai26@aaai.org",notes:"Speakers: Peter Stone (Chief Scientist of Sony AI), Bowen Zhou (President of JD Cloud & AI) - full list here"},
+  {id:uid(),name:"AI & Big Data Expo Global",month:"February",startDate:"2026-02-04",endDate:"2026-02-05",audience:"Enterprises, Developers, Investors",themes:"AI Infrastructure, AI Applications, Agentic AI, AI Ethics & Policy",organizer:"AI & Big Data Expo Global (did not see exact contact info) — ai@techexevent.com",notes:"Speakers: Konstantina Kapetandidi (VP of Global Data Solutions and Head of Data Science, Europe for Visa), Shekkhar Kullarni (Chief Architecy, Deutsche Telekom) - full list here"},
+  {id:uid(),name:"World AI Cannes Festival",month:"February",startDate:"2026-02-12",endDate:"2026-02-13",audience:"Investors, Developers, Enterprises",themes:"AI Infrastructure, AI Applications, AI Ethics & Policy, Agentic AI",organizer:"Justine Ba — justine@publicstudio.fr",notes:"Speakers: Andrea Laghi (Director of the Department of Diagnostic Imagining at Humanitas), Arnaud Jean (Senior Solutions Architect at AWS) - full list here"},
+  {id:uid(),name:"NVIDIA GTC",month:"March",startDate:"2026-03-16",endDate:"2026-03-19",audience:"Developers, Investors, Enterprises",themes:"AI Infrastructure, AI Applications, AI Ethics & Policy",organizer:"NVIDIA GTC (didn't see specific contact) — GTC_registration@nvidia.com or info@nvidia.com",notes:"Speakers: 2026 speakers yet to be announced but 2025 included: Frances Arnold (Nobel Laureate in Chemistry + Professor at California Insitute of Technology), RJ Scaringe (Founder and CEO of Rivian), Yann LeCun (Chief AI Scientist at Meta + NYU Professor) - full link here"},
+  {id:uid(),name:"HumanX",month:"April",startDate:"2026-04-06",endDate:"2026-04-09",audience:"Enterprises, Investors, Developers",themes:"AI Infrastructure, AI Applications, Agentic AI, AI Ethics & Policy",organizer:"Stefan Weitz — stefan@humanx.com",notes:"Speakers: Matt Garman (CEO of Amazon Web Services), Sarah Guo (Founder and General Partner at Conviction), Al Gore (Founding Partner and Chairman of Generation Investment Management) - full list here"},
+  {id:uid(),name:"Google Cloud Next",month:"April",startDate:"2026-04-22",endDate:"2026-04-24",audience:"Developers, Investors, Enterprises",themes:"AI Infrastructure, AI Applications",organizer:"Google Summit (no specific contact provided) — next26analystsummit@google.com",notes:"Speakers: Thomas Kurian (CEO of Google Cloud), Hayete Gallot (President, Customer Experience at Google Cloud) - full list here"},
+  {id:uid(),name:"EmTech AI (MIT)",month:"April",startDate:"2026-04-21",endDate:"2026-04-23",audience:"Developers, Investors, Enterprises",themes:"AI Applications, AI Infrastructure, Agentic AI",organizer:"EmTech AI (MIT) (did not see specific person listed) — eventsreg@technologyreview.com",notes:"Speakers: 2026 speakers not live yet but 2025 included: Robert Bench (CEO & Cofounder of Radius Technology Systems), Santanu\nBhattacharya (Scientist at MIT Media Lab), Rodney Brooks (Cofounder and CTO, Robust.AI; Cofounder of iRobot) - full list here"},
+  {id:uid(),name:"ODSC – Open Data Science Conference",month:"April",startDate:"2026-04-28",endDate:"2026-04-30",audience:"Enterprises, Developers",themes:"AI Infrastructure, AI Applications",organizer:"ODSC AI (did not see specific person to contact) — info@odsc.com",notes:"Speakers: 2026 list not available, 2025 included: Harrison Chase (CEO and Co-Founder of Langchain), Lora Aroyo (Senior Research Scientist for Google Deepmind) - full list here"},
+  {id:uid(),name:"Ai Everything Global Summit",month:"May",startDate:"2026-05-11",endDate:"2026-05-13",audience:"Developers, Investors, Enterprises",themes:"AI Infrastructure, AI Applications, Agentic AI, AI Ethics & Policy",organizer:"AI Everything Global (did not see specific contact) — sales@aieverythingglobal.com",notes:"Speakers: 2026 list not available, 2025 included: Chloe Bakal (Chief AI Ethicist (Meta), Dr. Chaouki Kasmi (Chief Innovation Officer for TII) - full list here"},
+  {id:uid(),name:"Embedded Vision Summit",month:"May",startDate:"2026-05-19",endDate:"2026-05-21",audience:"Developers, Enterprises",themes:"AI Infrastructure, AI Applications",organizer:"Embedded Vision Summit (did not see a contact person) — nfo@edge-ai-vision.com",notes:"Speakers: Trevor Darrell (Professor at UC, Berkeley), Gérard Medioni (Vice President and Distinguished Scientist, Amazon Prime Video and Studios) - full list here"},
+  {id:uid(),name:"Italy AI Week",month:"May",startDate:"2026-05-19",endDate:"2026-05-20",audience:"Developers, Investors, Enterprises",themes:"AI Infrastructure, AI Applications, AI Ethics & Policy, Agentic AI",organizer:"AI Week (no specific person listed) — info@aiweek.it",notes:"Speakers: Advait Sarkar (Senior Researcher at Microsoft), Karen Hao (Journalist, Author of the New York Times bestseller “Empire of A” - The Atlantic) - full list here"},
+  {id:uid(),name:"The AI Summit London",month:"June",startDate:"2026-06-10",endDate:"2026-06-11",audience:"Developers, Enterprises",themes:"AI Infrastructure, AI Applications",organizer:"Caroline Hicks — caroline.hicks@informa.com",notes:"Speakers: Rodrigo Liang (Co-founder and CEO, SambaNova Systems), Marilyn Chaplin (Former Chief Human Resources Officer, NTT), David Norris (Chief Growth Officer, Holiday Extras), (link to the full list)"},
+  {id:uid(),name:"Data + AI Summit",month:"June",startDate:"2026-06-15",endDate:"2026-06-18",audience:"Developers, Investors, Enterprises",themes:"AI Infrastructure, AI Applications",organizer:"Databricks (didn't see specific contact listed) — dataaisummit@regsvc.com",notes:"Speakers: Adam Levine (Staff Software Engineer, Databricks), Aiden Lee (CTO and Co-Founder of Twelve Labs, Inc) - full list here"},
+  {id:uid(),name:"Super AI",month:"June",startDate:"2026-06-10",endDate:"2026-06-11",audience:"Developers, Enterprises",themes:"AI Infrastructure, AI Applications",organizer:"Super AI (specific contact not found) — ecosystem@superai.com",notes:"Speakers: Balaji Srinivasan (Founder, Investor and Author for The Network State), Dwarkesh Patel (Host of the Dwarkesh Podcast), Tao Cheung (Co-Founder of Manus AI) - full list here"},
+  {id:uid(),name:"AI Con",month:"June",startDate:"2026-06-07",endDate:"2026-06-12",audience:"Investors, Developers, Enterprises",themes:"AI Infrastructure, AI Applications, AI Ethics & Policy, Agentic AI",organizer:"Coveros (did not see a specific contact) — clientsupport@coveros.com",notes:"Speakers: Jonathan Miller Kauffman (Senior Consultant for Coveros, Inc), Jeff Pierce (Managing Consultant for Coveros) - full list here"},
+  {id:uid(),name:"Raise Summit",month:"July",startDate:"2026-07-08",endDate:"2026-07-09",audience:"Developers, Investors, Enterprises",themes:"AI Applications, AI Ethics & Policy, AI Infrastructure",organizer:"Raise Summit (did not see a specific person) — support@raisesummit.com",notes:"Speakers: Eric Schmidt (Executive Chairman & CEO of Relativity Space), Nikesh Arora (CEO and Chairperson of Palo Alto Networks) - full list here"},
+  {id:uid(),name:"Ai4",month:"August",startDate:"2026-08-04",endDate:"2026-08-06",audience:"Developers, Enterprises",themes:"AI Infrastructure, AI Applications",organizer:"Glenn Morizio — glenn@ai4.co",notes:"Speakers: Geoffrey Hinton (Nobel Prize Winner & \"Godfather of AI\"), Fei-Fei Li (Co-Founder, CEO & \"Godmother of AI\"), Prashant Mehrotra (Chief AI Officer of US Bank) - full list here"},
+  {id:uid(),name:"IJCAI – International Joint Conference on Artificial Intelligence",month:"August",startDate:"2026-08-15",endDate:"2026-08-21",audience:"Developers, Investors",themes:"AI Applications, AI Infrastructure",organizer:"IJCAI (no specific contact listed) — pcchair@2026.ijcai.org",notes:"Speakers: 2026 not released yet but 2025 included: Rina Dechter (University of California, Irvine), Cynthia Rudin (Duke Univeristy) - full list here"},
+  {id:uid(),name:"AI Infra Summit",month:"September",startDate:"2026-09-15",endDate:"2026-09-17",audience:"Investors, Enterprises, Developers",themes:"AI Infrastructure, AI Applications, Agentic AI",organizer:"Kisaco Research (did not see a specific person listed) — events@kisacoresearch.com",notes:"Speakers: 2026 speakers not released yet but 2025 included: Alan Rosa (CISO & SVP of Technology at CVS Health), Ankur Gupta (SVP & GM at Siemens EDA) - full list here"},
+  {id:uid(),name:"All in AI",month:"September",startDate:"2026-09-16",endDate:"2026-09-17",audience:"Developers, Enterprises",themes:"AI Infrastructure, AI Applications",organizer:"All in Events (did not see a specific person mentioned) — info@allinevent.ai",notes:"Speakers: 2026 speakers not released yet but 2025 included: Philippe Achkar (Director of Expertise and Solutions at BDC), Angela Adam (SVP of Sales and Marketing for eStruxture Data Centers) - full list here"},
+  {id:uid(),name:"Finance Leaders Forum",month:"September",startDate:"2026-09-03",endDate:"2026-09-03",audience:"Investors, Enterprises",themes:"AI Infrastructure",organizer:"Caprice Jee — caprice.jee@connectmedia.com",notes:"Speakers: 2026 speakers not listed yet but 2025 included: Robin Stalker (CFO of Adidas), John Goodwin (CFO of Lego), Melissa Azzopardi (General Manager of Finance at AFL)"},
+  {id:uid(),name:"Oracle AI World",month:"October",startDate:"2026-10-26",endDate:"2026-10-29",audience:"Developers, Investors, Enterprises",themes:"AI Infrastructure, Agentic AI, AI Applications",organizer:"Oracle — oracleaiworld@regsvcoracle.com",notes:"Speakers: 2026 speakers not released yet - 2025 included: Larry Ellison (Ocacle's Chairman and CTO), Safra Catz (Oracle's CEO) and Mike Sicilla (Oracle's Co-CEO) - full list not on their website but found an article here"},
+  {id:uid(),name:"World Summit AI",month:"October",startDate:"2026-10-07",endDate:"2026-10-08",audience:"Developers, Investors, Enterprises",themes:"AI Infrastructure, Agentic AI, AI Applications",organizer:"World Summit AI (could not find specific person) — enquiries@inspired-minds.co.uk",notes:"Speakers: 2026 speakers not released yet - but 2025 included: Cassie Kosykov (Chief Decision Scientist at Google), Yann LeCun (VP & Chief AI Scientist at Meta) and Werner Vogels (VP and CTO at Amazon) - full link here"},
+  {id:uid(),name:"Adopt AI",month:"November",startDate:"2025-11-25",endDate:"2025-11-26",audience:"Developers, Investors, Enterprises",themes:"AI Infrastructure, AI Applications",organizer:"Artefact (did not see a specific person listed) — info@artefactgroup.com",notes:"Speakers: Dr. Najwa Aaraj (CEO of Technology Innovation Institute), Prof. Ian Abbs (Strategic Advisor, Former CEO for NHS)"},
+  {id:uid(),name:"AI For Marketers Summit",month:"November",startDate:"2026-11-12",endDate:"2026-11-14",audience:"Investors, Enterprises",themes:"AI Infrastructure, AI Applications",organizer:"Jessica Vargas — jessica@gsmiweb.com",notes:"Speakers: Patricia Mestre (Head of Partner Marketing for EMEA, Data&AI for Microsoft), Navneet Singh (CMO for Eightfold.ai), Colleen Romero (CMO for Swanson Health) - full list here"},
+  {id:uid(),name:"DSC Europe",month:"November",startDate:"Exact dates not given",endDate:"N/A",audience:"Investors, Enterprises",themes:"AI Infrastructure, AI Applications",organizer:"Volvo Group (did not see a specific contact) — dsc.eu@volvo.com",notes:"Speakers: 2026 speakers not live yet but 2025 included: Beth Noveck (Professor of Law and AI at Northeastern University), Manoj Tyagi (VP of Architecture and Development at DBS Bank)"},
+  {id:uid(),name:"AI 2030 Summit",month:"December",startDate:"2025-12-02",endDate:"2025-12-02",audience:"Enterprises",themes:"AI Infrastructure, AI Applications",organizer:"AI 2030 (no specific person listed) — info@ai2030.com",notes:"Speakers: Does not list upcoming speakers lineup but previously: Steve Goldberg (Partner at DYDX Capital), Wendy (Koh) Gonzalez (SEO at Sama) - full list here"},
+  {id:uid(),name:"The AI Summit New York",month:"December",startDate:"2026-12-09",endDate:"2026-12-10",audience:"Developers, Enterprises",themes:"AI Infrastructure, AI Applications",organizer:"Caroline Hicks — caroline.hicks@informa.com",notes:"Speakers: Hannah Helin (SVP of Data and Emerging Technologies, NBCUniversal), Nnanna Kalu-Mba (ICT for Development Expert, United Nations Population Fund (UNFPA)) (link to full speakers list)"},
 ];
 
 // ═══════════════════════════════════════════════════════
