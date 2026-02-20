@@ -189,6 +189,22 @@ code{font-family:'DM Mono',monospace;font-size:11px;background:var(--cream);padd
 .conn-status.err{color:var(--red)}
 .setup-note{background:var(--amber-bg);border-radius:4px;padding:12px 14px;font-size:12px;color:var(--amber);line-height:1.6;border-left:3px solid var(--amber)}
 
+
+/* CHECKBOX SELECTION */
+.cb-cell{width:32px;padding:8px 4px 8px 12px !important}
+.cb-cell input[type=checkbox]{width:15px;height:15px;cursor:pointer;accent-color:var(--red)}
+thead th.cb-cell{padding:8px 4px 8px 12px !important}
+tbody tr.selected{background:var(--red-bg) !important}
+
+/* BULK ACTION BAR */
+.bulk-action-bar{display:none;align-items:center;gap:10px;padding:8px 24px;background:#fff8f7;border-bottom:2px solid var(--red);border-top:1px solid rgba(200,55,45,0.15)}
+.bulk-action-bar.on{display:flex}
+.bulk-sel-count{font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:var(--red)}
+.btn-bulk-del{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.05em;text-transform:uppercase;background:var(--red);color:#fff;border:none;border-radius:3px;padding:7px 14px;cursor:pointer;transition:background .15s}
+.btn-bulk-del:hover{background:#a82820}
+.btn-bulk-cancel{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.05em;text-transform:uppercase;background:none;color:var(--steel);border:1.5px solid var(--border);border-radius:3px;padding:7px 12px;cursor:pointer;transition:all .15s}
+.btn-bulk-cancel:hover{border-color:var(--ink);color:var(--ink)}
+
 /* TOAST */
 .toast{position:fixed;bottom:20px;right:20px;background:var(--ink);color:#fff;font-family:'DM Mono',monospace;font-size:12px;padding:10px 15px;border-radius:4px;opacity:0;transform:translateY(8px);transition:all .2s;pointer-events:none;z-index:500;max-width:340px;line-height:1.5}
 .toast.on{opacity:1;transform:translateY(0)}
@@ -239,6 +255,18 @@ code{font-family:'DM Mono',monospace;font-size:11px;background:var(--cream);padd
     <button class="clr-btn" onclick="clearAll()">↺ Clear filters</button>
   </aside>
   <div class="main">
+    <div class="bulk-action-bar" id="bulkActionBar">
+      <span class="bulk-sel-count"><span id="selCount">0</span> selected</span>
+      <div id="selNormal" style="display:flex;gap:8px;align-items:center">
+        <button class="btn-bulk-del" onclick="askDeleteSelected()">✕ Delete Selected</button>
+        <button class="btn-bulk-cancel" onclick="clearSelection()">Cancel</button>
+      </div>
+      <div id="selConfirm" style="display:none;gap:8px;align-items:center">
+        <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--red)">Sure? This cannot be undone.</span>
+        <button class="btn-bulk-del" onclick="deleteSelected()">Yes, Delete</button>
+        <button class="btn-bulk-cancel" onclick="cancelDeleteSelected()">No, Keep</button>
+      </div>
+    </div>
     <div class="rbar">
       <div class="rcount"><span id="matchCount">—</span> reporters</div>
       <div class="pills" id="activePills"></div>
@@ -255,7 +283,7 @@ code{font-family:'DM Mono',monospace;font-size:11px;background:var(--cream);padd
       </div>
       <table id="tbl" style="display:none">
         <thead><tr>
-          <th>Outlet</th><th>Reporter</th><th>Email</th><th>Tier</th><th>Beat</th><th>Sector</th><th>Type</th><th>Country</th><th>Themes</th><th>Notes</th><th></th>
+          <th class="cb-cell"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"></th><th>Outlet</th><th>Reporter</th><th>Email</th><th>Tier</th><th>Beat</th><th>Sector</th><th>Type</th><th>Country</th><th>Notes</th><th></th>
         </tr></thead>
         <tbody id="tbody"></tbody>
       </table>
@@ -276,6 +304,18 @@ code{font-family:'DM Mono',monospace;font-size:11px;background:var(--cream);padd
     <button class="clr-btn" onclick="clearConfAll()">↺ Clear filters</button>
   </aside>
   <div class="main">
+    <div class="bulk-action-bar" id="confBulkActionBar">
+      <span class="bulk-sel-count"><span id="confSelCount">0</span> selected</span>
+      <div id="confSelNormal" style="display:flex;gap:8px;align-items:center">
+        <button class="btn-bulk-del" onclick="askDeleteConfSelected()">✕ Delete Selected</button>
+        <button class="btn-bulk-cancel" onclick="clearConfSelection()">Cancel</button>
+      </div>
+      <div id="confSelConfirm" style="display:none;gap:8px;align-items:center">
+        <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--red)">Sure? This cannot be undone.</span>
+        <button class="btn-bulk-del" onclick="deleteConfSelected()">Yes, Delete</button>
+        <button class="btn-bulk-cancel" onclick="cancelDeleteConfSelected()">No, Keep</button>
+      </div>
+    </div>
     <div class="rbar">
       <div class="rcount"><span id="confMatchCount">—</span> events</div>
       <div class="pills" id="confActivePills"></div>
@@ -292,7 +332,7 @@ code{font-family:'DM Mono',monospace;font-size:11px;background:var(--cream);padd
       </div>
       <table id="confTbl" style="display:none">
         <thead><tr>
-          <th>Month</th><th>Start Date</th><th>End Date</th><th>Event Name</th><th>Audience</th><th>Themes</th><th>Organizer Contact</th><th></th>
+          <th class="cb-cell"><input type="checkbox" id="confSelectAll" onclick="toggleConfSelectAll()"></th><th>Month</th><th>Start Date</th><th>End Date</th><th>Event Name</th><th>Audience</th><th>Themes</th><th>Organizer Contact</th><th></th>
         </tr></thead>
         <tbody id="confTbody"></tbody>
       </table>
@@ -652,6 +692,148 @@ function setConnStatus(msg,cls){
 
 
 
+
+// ═══════════════════════════════════════════════════════
+// MULTI-SELECT & BULK DELETE — REPORTERS
+// ═══════════════════════════════════════════════════════
+let selectedIds = new Set();
+
+function toggleSelect(id, checked){
+  checked ? selectedIds.add(id) : selectedIds.delete(id);
+  updateSelectionUI();
+}
+
+function toggleSelectAll(){
+  const all = document.getElementById('selectAll');
+  const rows = filteredReporters();
+  if(all.checked){ rows.forEach(r=>selectedIds.add(r.id)); }
+  else { rows.forEach(r=>selectedIds.delete(r.id)); }
+  updateSelectionUI();
+  render();
+}
+
+function clearSelection(){
+  selectedIds.clear();
+  const sa = document.getElementById('selectAll');
+  if(sa) sa.checked = false;
+  updateSelectionUI();
+  render();
+}
+
+function updateSelectionUI(){
+  const bar = document.getElementById('bulkActionBar');
+  const cnt = document.getElementById('selCount');
+  if(selectedIds.size > 0){
+    bar.classList.add('on');
+    cnt.textContent = selectedIds.size;
+  } else {
+    bar.classList.remove('on');
+  }
+  // sync checkboxes in existing rows without re-rendering
+  document.querySelectorAll('#tbody tr').forEach(tr=>{
+    const cb = tr.querySelector('input[type=checkbox]');
+    if(cb){
+      const id = cb.getAttribute('onchange').match(/'([^']+)'/)?.[1];
+      if(id){ const sel = selectedIds.has(id); cb.checked = sel; tr.classList.toggle('selected', sel); }
+    }
+  });
+  const rows = filteredReporters();
+  const sa = document.getElementById('selectAll');
+  if(sa) sa.checked = rows.length > 0 && rows.every(r=>selectedIds.has(r.id));
+}
+
+function askDeleteSelected(){
+  document.getElementById('selNormal').style.display='none';
+  document.getElementById('selConfirm').style.display='flex';
+}
+function cancelDeleteSelected(){
+  document.getElementById('selNormal').style.display='flex';
+  document.getElementById('selConfirm').style.display='none';
+}
+function deleteSelected(){
+  if(!selectedIds.size) return;
+  const count = selectedIds.size;
+  DB.reporters = DB.reporters.filter(r=>!selectedIds.has(r.id));
+  selectedIds.clear();
+  scheduleSave(); buildAllChips(); render();
+  document.getElementById('bulkActionBar').classList.remove('on');
+  document.getElementById('selNormal').style.display='flex';
+  document.getElementById('selConfirm').style.display='none';
+  const sa = document.getElementById('selectAll');
+  if(sa) sa.checked = false;
+  toast(`Deleted ${count} reporter${count>1?'s':''}`, 'w');
+}
+
+// ═══════════════════════════════════════════════════════
+// MULTI-SELECT & BULK DELETE — CONFERENCES
+// ═══════════════════════════════════════════════════════
+let confSelectedIds = new Set();
+
+function toggleConfSelect(id, checked){
+  checked ? confSelectedIds.add(id) : confSelectedIds.delete(id);
+  updateConfSelectionUI();
+}
+
+function toggleConfSelectAll(){
+  const all = document.getElementById('confSelectAll');
+  const rows = filteredConfs();
+  if(all.checked){ rows.forEach(c=>confSelectedIds.add(c.id)); }
+  else { rows.forEach(c=>confSelectedIds.delete(c.id)); }
+  updateConfSelectionUI();
+  renderConf();
+}
+
+function clearConfSelection(){
+  confSelectedIds.clear();
+  const sa = document.getElementById('confSelectAll');
+  if(sa) sa.checked = false;
+  updateConfSelectionUI();
+  renderConf();
+}
+
+function updateConfSelectionUI(){
+  const bar = document.getElementById('confBulkActionBar');
+  const cnt = document.getElementById('confSelCount');
+  if(confSelectedIds.size > 0){
+    bar.classList.add('on');
+    cnt.textContent = confSelectedIds.size;
+  } else {
+    bar.classList.remove('on');
+  }
+  document.querySelectorAll('#confTbody tr').forEach(tr=>{
+    const cb = tr.querySelector('input[type=checkbox]');
+    if(cb){
+      const id = cb.getAttribute('onchange').match(/'([^']+)'/)?.[1];
+      if(id){ const sel = confSelectedIds.has(id); cb.checked = sel; tr.classList.toggle('selected', sel); }
+    }
+  });
+  const rows = filteredConfs();
+  const sa = document.getElementById('confSelectAll');
+  if(sa) sa.checked = rows.length > 0 && rows.every(c=>confSelectedIds.has(c.id));
+}
+
+function askDeleteConfSelected(){
+  document.getElementById('confSelNormal').style.display='none';
+  document.getElementById('confSelConfirm').style.display='flex';
+}
+function cancelDeleteConfSelected(){
+  document.getElementById('confSelNormal').style.display='flex';
+  document.getElementById('confSelConfirm').style.display='none';
+}
+function deleteConfSelected(){
+  if(!confSelectedIds.size) return;
+  const count = confSelectedIds.size;
+  DB.conferences = DB.conferences.filter(c=>!confSelectedIds.has(c.id));
+  confSelectedIds.clear();
+  scheduleSave(); buildConfChips(); renderConf();
+  document.getElementById('confBulkActionBar').classList.remove('on');
+  document.getElementById('confSelNormal').style.display='flex';
+  document.getElementById('confSelConfirm').style.display='none';
+  const sa = document.getElementById('confSelectAll');
+  if(sa) sa.checked = false;
+  toast(`Deleted ${count} event${count>1?'s':''}`, 'w');
+}
+
 // ═══════════════════════════════════════════════════════
 // BULK ADD CONFERENCES
 // ═══════════════════════════════════════════════════════
@@ -909,10 +1091,10 @@ function render(){
   empty.classList.remove('on'); tbl.style.display='';
 
   document.getElementById('tbody').innerHTML=rows.map(r=>{
-    const themeTags=(r.themes||'').split(',').map(t=>t.trim()).filter(Boolean)
-      .map(t=>`<span class="tag tq">${x(t)}</span>`).join('');
     const tierCls=r.tier==='Tier 1'?'tier1':r.tier==='Tier 2'?'tier2':'tier3';
-    return `<tr>
+    const isSel=selectedIds.has(r.id);
+    return `<tr class="${isSel?'selected':''}">
+      <td class="cb-cell"><input type="checkbox" ${isSel?"checked":""} onchange="toggleSelect('${r.id}',this.checked)"></td>
       <td>${x(r.outlet)}</td>
       <td class="n">${x(r.name)}</td>
       <td class="em">${x(r.email)}</td>
@@ -921,7 +1103,6 @@ function render(){
       <td>${r.sector?`<span class="tag ts">${x(r.sector)}</span>`:'—'}</td>
       <td>${r.type?`<span class="tag tt">${x(r.type)}</span>`:'—'}</td>
       <td>${r.country?`<span class="tag tc">${x(r.country)}</span>`:'—'}</td>
-      <td><div class="tags-cell">${themeTags||'—'}</div></td>
       <td class="nt">${x(r.notes)}</td>
       <td><div class="act-btns">
         <button class="act-btn btn-edit" onclick="openEdit('${r.id}')">Edit</button>
@@ -977,10 +1158,12 @@ function renderConf(){
   empty.classList.remove('on'); tbl.style.display='';
 
   document.getElementById('confTbody').innerHTML=rows.map(c=>{
+    const isSel=confSelectedIds.has(c.id);
     const themeTags=(c.themes||'').split(',').map(t=>t.trim()).filter(Boolean)
       .map(t=>`<span class="tag tq">${x(t)}</span>`).join('');
     const fmtDate=d=>{if(!d)return'—';const [y,m,dd]=d.split('-');return`${dd}/${m}/${y}`;};
-    return `<tr>
+    return `<tr class="${isSel?'selected':''}">
+      <td class="cb-cell"><input type="checkbox" ${isSel?"checked":""} onchange="toggleConfSelect('${c.id}',this.checked)"></td>
       <td>${c.month?`<span class="tag tc">${x(c.month)}</span>`:'—'}</td>
       <td>${fmtDate(c.startDate)}</td>
       <td>${fmtDate(c.endDate)}</td>
@@ -1126,26 +1309,64 @@ function openBulk(){
 }
 function closeBulk(){ document.getElementById('bulkModal').classList.remove('on'); }
 
+// ── Smart column sniffers ──
+const KNOWN_TIERS    = ['tier 1','tier 2','tier 3'];
+const KNOWN_TYPES    = ['publication','podcast','broadcast','magazine','newsletter'];
+const KNOWN_BEATS_KW = ['funding','product','market','launch'];
+const KNOWN_COUNTRIES= ['france','germany','uk','uae','us','usa','singapore','japan','hong kong','south korea','switzerland','thailand','other'];
+const KNOWN_SECTORS  = ['ai','crypto','fintech','finance','business','technology','news','mainstream','markets'];
+
+function sniffCol(val){
+  const v=val.toLowerCase().trim();
+  if(v.includes('@')) return 'email';
+  if(KNOWN_TIERS.some(t=>v===t)) return 'tier';
+  if(KNOWN_TYPES.some(t=>v===t)) return 'type';
+  if(KNOWN_BEATS_KW.some(k=>v.includes(k))) return 'beat';
+  if(KNOWN_COUNTRIES.some(c=>v===c)) return 'country';
+  if(KNOWN_SECTORS.some(s=>v===s)) return 'sector';
+  // themes: comma/semicolon separated list of known theme words
+  if((v.includes(',') || v.includes(';')) && !v.includes('@')) return 'themes';
+  return 'text';
+}
+
 function parseBulk(){
   const raw=document.getElementById('bulkInput').value;
   const lines=raw.split('\n').map(l=>l.trim()).filter(l=>l);
   bulkParsed=[]; const errs=[];
   lines.forEach((line,i)=>{
     const cols=(line.includes('\t')?line.split('\t'):line.split(',')).map(c=>c.trim().replace(/^"|"$/g,'').trim());
-    // Auto-detect email column — find the col containing '@'
-    const emailIdx=cols.findIndex(c=>c.includes('@'));
-    if(emailIdx===-1){ errs.push(`Row ${i+1}: no email found`); return; }
-    const email=cols[emailIdx];
-    // Name is the first non-email text column before or after email
-    // Try col before email first, else col after
-    const nameIdx=emailIdx>0?emailIdx-1:emailIdx+1;
-    const name=cols[nameIdx]||'';
+
+    // Assign each column a role by sniffing its content
+    const assigned = { email:'', tier:'', type:'', beat:'', country:'', sector:'', themes:'', notes:'' };
+    const textCols = []; // unclassified — name, outlet, notes candidates
+
+    cols.forEach(val=>{
+      const role = sniffCol(val);
+      if(role==='email' && !assigned.email)        assigned.email   = val;
+      else if(role==='tier' && !assigned.tier)     assigned.tier    = val;
+      else if(role==='type' && !assigned.type)     assigned.type    = val;
+      else if(role==='beat' && !assigned.beat)     assigned.beat    = val;
+      else if(role==='country' && !assigned.country) assigned.country = val;
+      else if(role==='sector' && !assigned.sector) assigned.sector  = val;
+      else if(role==='themes' && !assigned.themes) assigned.themes  = val;
+      else textCols.push(val);
+    });
+
+    if(!assigned.email){ errs.push(`Row ${i+1}: no email found`); return; }
+
+    // First text col = name, second = outlet, rest = notes
+    const name   = textCols[0] || '';
+    const outlet = textCols[1] || '';
+    const notes  = textCols.slice(2).join(' ').trim();
+
     if(!name){ errs.push(`Row ${i+1}: missing name`); return; }
-    // Remaining cols (excluding name & email) for other fields
-    const rest=cols.filter((_,idx)=>idx!==emailIdx&&idx!==nameIdx);
-    const [outlet='',tier='',beat='',sector='',country='',type='',themes='',...notesCols]=rest;
-    const notes=notesCols.join(',').trim();
-    bulkParsed.push({id:uid(),name,email,outlet,tier,beat,sector,country,type,themes:themes.replace(/;/g,','),notes});
+
+    bulkParsed.push({
+      id:uid(), name, email:assigned.email, outlet,
+      tier:assigned.tier, beat:assigned.beat, sector:assigned.sector,
+      country:assigned.country, type:assigned.type,
+      themes:assigned.themes.replace(/;/g,','), notes
+    });
   });
   const prev=document.getElementById('bulkPreview');
   const btn =document.getElementById('bulkSaveBtn');
@@ -1300,167 +1521,9 @@ function closeSetup(){ document.getElementById('setupModal').classList.remove('o
 // ═══════════════════════════════════════════════════════
 // SEED DATA
 // ═══════════════════════════════════════════════════════
-const SEED_DATA=[
-  {id:uid(),name:"Zoe Kleinman",email:"zoe.kleinman@bbc.co.uk",outlet:"BBC: Future Tech",tier:"Tier 1",beat:"Markets News, Product News",themes:"AI Dev Tools, Launch News, Large Languge Model (LLM) Training, AI Infrastructure",type:"Publication",sector:'',country:'',notes:''},
-  {id:uid(),name:"Thomas Germain",email:"thomas.germain@bbc.com",outlet:"BBC: Future Tech",tier:"Tier 1",beat:"Product News, Markets News",themes:"Machine Learning, Large Languge Model (LLM) Training, AI Dev Tools",type:"Publication",sector:'',country:'',notes:''},
-  {id:uid(),name:"Ashley Capoot",email:"ashley.capoot@versantmedia.com",outlet:"CNBC",tier:"Tier 1",beat:"Product News, Funding News, Markets News",themes:"AI Infrastructure, AI Policy & Regulation, Expert Commentary, Launch News, Funding News",type:"Publication",sector:'',country:'',notes:''},
-  {id:uid(),name:"Arjun Kharpal",email:"arjun.kharpal@versantmedia.com",outlet:"CNBC",tier:"Tier 1",beat:"Markets News, Funding News, Product News",themes:"AI Policy & Regulation, AI Infrastructure, Funding News, Launch News",type:"Publication",sector:'',country:'',notes:''},
-  {id:uid(),name:"Tripp Mickle",email:"tripp.mickle@nytimes.com",outlet:"NY Times",tier:"Tier 1",beat:"Markets News, Funding News",themes:"Launch News, Funding News, AI Infrastructure, Expert Commentary, Machine Learning",type:"Publication",sector:'',country:'',notes:''},
-  {id:uid(),name:"Kashmir Hill",email:"kashmir.hill@nytimes.com",outlet:"NY Times",tier:"Tier 1",beat:"Markets News, Funding News, Product News",themes:"AI Infrastructure, Machine Learning, Launch News, AI Policy & Regulation",type:"Publication",sector:'',country:'',notes:''},
-  {id:uid(),name:"Cade Metz",email:"cade.metz@nytimes.com",outlet:"NY Times",tier:"Tier 1",beat:"Markets News, Funding News, Product News",themes:"AI Infrastructure, Machine Learning, Large Languge Model (LLM) Training, AI Applications, Funding News, Expert Commentary",type:"Publication",sector:'',country:'',notes:''},
-  {id:uid(),name:"Supantha Mukherjee",email:"supantha.mukherjee@thomsonreuters.com",outlet:"Reuters",tier:"Tier 2",beat:"Markets News, Product News",themes:"AI Policy & Regulation, AI Infrastructure, Funding News, AI Applications",type:"Publication",sector:'',country:'',notes:''},
-  {id:uid(),name:"Jeffrey Dastin",email:"jeffrey.dastin@thomsonreuters.com",outlet:"Reuters",tier:"Tier 2",beat:"Product News, Markets News, Funding News",themes:"AI Infrastructure, Machine Learning, Large Languge Model (LLM) Training, Funding News, AI Policy & Regulation",type:"Publication",sector:'',country:'',notes:''},
-  {id:uid(),name:"Thomas Maxwell",email:"tommaxwell95@gmail.com",outlet:"Business Insider",tier:"Tier 2",beat:"Markets News, Funding News",themes:"AI Applications, AI Policy & Regulation, AI Dev Tools",type:"Publication",sector:'',country:'',notes:''},
-  {id:uid(),name:"Katie Notopoulos",email:"knotopoulos@businessinsider.com",outlet:"Business Insider",tier:"Tier 2",beat:"Markets News, Funding News, Product News",themes:"AI Infrastructure, AI Applications, AI Dev Tools, AI Policy & Regulation",type:"Publication",sector:'',country:'',notes:''},
-  {id:uid(),name:"Alistair Barr",email:"abarr@businessinsider.com",outlet:"Business Insider",tier:"Tier 2",beat:"Product News, Markets News",themes:"Large Languge Model (LLM) Training, AI Applications, AI Dev Tools, Expert Commentary",type:"Publication",sector:'',country:'',notes:''},
-  {id:uid(),name:"Belle Lin",email:"belle.lin@wsj.com",outlet:"Wall Street Journal",tier:"Tier 2",beat:"Markets News, Product News, Funding News",themes:"AI Dev Tools, AI Applications, AI Infrastructure, AI Policy & Regulation, Expert Commentary, Launch News",type:"Publication",sector:'',country:'',notes:''},
-  {id:uid(),name:"Isabelle Bousquette",email:"isabelle.bousquette@wsj.com",outlet:"Wall Street Journal",tier:"Tier 2",beat:"Markets News, Funding News, Product News",themes:"Launch News, Expert Commentary, Large Languge Model (LLM) Training, Machine Learning, Funding News",type:"Publication",sector:'',country:'',notes:''},
-  {id:uid(),name:"Richard Nieva",email:"rnieva@forbes.com",outlet:"Forbes",tier:"Tier 2",beat:"Product News, Markets News, Funding News",themes:"Launch News, Funding News, AI Policy & Regulation, Machine Learning",type:"Publication",sector:'',country:'',notes:''},
-  {id:uid(),name:"Anna Tong",email:"atong@forbes.com",outlet:"Forbes",tier:"Tier 2",beat:"Markets News, Funding News",themes:"AI Infrastructure, AI Dev Tools, AI Applications, Launch News",type:"Publication",sector:'',country:'',notes:''},
-  {id:uid(),name:"Rashi Shrivastava",email:"rshrivastava@forbes.com",outlet:"Forbes",tier:"Tier 2",beat:"Markets News, Funding News, Product News",themes:"AI Infrastructure, AI Policy & Regulation, Expert Commentary, AI Dev Tools, AI Applications, Machine Learning",type:"Publication",sector:'',country:'',notes:''},
-  {id:uid(),name:"Rachel Metz",email:"rmetz17@bloomberg.net",outlet:"Bloomberg",tier:"Tier 3",beat:"Markets News, Funding News, Product News",themes:"AI Applications, AI Policy & Regulation, Expert Commentary, Machine Learning, Funding News",type:"Publication",sector:'',country:'',notes:''},
-  {id:uid(),name:"Shirin Ghaffary",email:"sghaffary@bloomberg.net",outlet:"Bloomberg",tier:"Tier 3",beat:"Markets News, Funding News, Product News",themes:"AI Infrastructure, Large Languge Model (LLM) Training, AI Policy & Regulation",type:"Publication",sector:'',country:'',notes:''},
-  {id:uid(),name:"Ina Fried",email:"ina@axios.com",outlet:"Axios",tier:"Tier 3",beat:"Funding News, Markets News, Product News",themes:"AI Policy & Regulation, Machine Learning, AI Infrastructure, Launch News, Funding News",type:"Publication",sector:'',country:'',notes:''},
-  {id:uid(),name:"Megan Morrone",email:"megan.morrone@axios.com",outlet:"Axios",tier:"Tier 3",beat:"Markets News, Funding News, Product News",themes:"Machine Learning, AI Infrastructure, Large Languge Model (LLM) Training, AI Dev Tools, Launch News, Expert Commentary",type:"Publication",sector:'',country:'',notes:''},
-  {id:uid(),name:"Maria Curi",email:"maria.curi@axios.com",outlet:"Axios",tier:"Tier 3",beat:"Product News, Markets News, Funding News",themes:"AI Infrastructure, Machine Learning, Large Languge Model (LLM) Training, AI Applications, Expert Commentary, Launch News",type:"Publication",sector:'',country:'',notes:''},
-  {id:uid(),name:"Madhumita Murgia",email:"madhumita.murgia@ft.com",outlet:"Financial Times",tier:"Tier 3",beat:"Funding News, Markets News, Product News",themes:"Launch News, AI Dev Tools, Expert Commentary, AI Policy & Regulation",type:"Publication",sector:'',country:'',notes:''},
-  {id:uid(),name:"Melissa Heikkilä",email:"melissa.heikkila@ft.com",outlet:"Financial Times",tier:"Tier 3",beat:"Markets News, Funding News, Product News",themes:"Machine Learning, AI Applications, Large Languge Model (LLM) Training, AI Infrastructure",type:"Publication",sector:'',country:'',notes:''},
-  {id:uid(),name:"Cristina Criddle",email:"cristina.criddle@ft.com",outlet:"Financial Times",tier:"Tier 3",beat:"Funding News, Markets News, Product News",themes:"AI Policy & Regulation, Expert Commentary, AI Infrastructure, Large Languge Model (LLM) Training",type:"Publication",sector:'',country:'',notes:''},
-  {id:uid(),name:"Beatrice Nolan",email:"bea.nolan@fortune.com",outlet:"Fortune",tier:"Tier 3",beat:"Funding News, Product News, Markets News",themes:"AI Infrastructure, Launch News, AI Applications, AI Policy & Regulation",type:"Publication",sector:'',country:'',notes:''},
-  {id:uid(),name:"Sharon Goldman",email:"sharon.goldman@fortune.com",outlet:"Fortune",tier:"Tier 3",beat:"Product News, Markets News, Funding News",themes:"Expert Commentary, Machine Learning, Large Languge Model (LLM) Training, Funding News, AI Dev Tools",type:"Publication",sector:'',country:'',notes:''},
-  {id:uid(),name:"Britney Nguyen",email:"britney.nguyen@marketwatch.com",outlet:"Marketwatch",tier:"Tier 3",beat:"Markets News",themes:"AI Policy & Regulation, AI Infrastructure",type:"Publication",sector:'',country:'',notes:''},
-  {id:uid(),name:"Laila Maidan",email:"laila.maidan@marketwatch.com",outlet:"Marketwatch",tier:"Tier 3",beat:"Markets News",themes:"AI Infrastructure, Expert Commentary",type:"Publication",sector:'',country:'',notes:''},
-  {id:uid(),name:"Jon Reed",email:"joreed@cnet.com",outlet:"CNET",tier:"Tier 1",beat:"Markets News, Product News",themes:"AI Policy & Regulation, Machine Learning, Large Languge Model (LLM) Training, AI Applications, AI Dev Tools",type:"Publication",sector:'',country:'',notes:''},
-  {id:uid(),name:"Macy Meyer",email:"mmeyer@cnet.com",outlet:"CNET",tier:"Tier 1",beat:"Markets News, Funding News, Product News",themes:"AI Infrastructure, Large Languge Model (LLM) Training, AI Dev Tools, Funding News",type:"Publication",sector:'',country:'',notes:''},
-  {id:uid(),name:"Katelyn Chedraoui",email:"kchedraoui@cnet.com",outlet:"CNET",tier:"Tier 1",beat:"Product News, Markets News",themes:"AI Infrastructure, Machine Learning, AI Dev Tools, Expert Commentary",type:"Publication",sector:'',country:'',notes:''},
-  {id:uid(),name:"Graham Barlow",email:"graham.barlow@futurenet.com",outlet:"TechRadar",tier:"Tier 1",beat:"Markets News, Funding News, Product News",themes:"Machine Learning, AI Applications, AI Dev Tools, Expert Commentary",type:"Publication",sector:'',country:'',notes:''},
-  {id:uid(),name:"John-Anthony Disotto",email:"john-anthony.disotto@futurenet.com",outlet:"TechRadar",tier:"Tier 1",beat:"Product News, Markets News",themes:"AI Applications, AI Dev Tools, Launch News, Funding News",type:"Publication",sector:'',country:'',notes:''},
-  {id:uid(),name:"Cecily Mauran",email:"cecily.mauran@mashable.com",outlet:"Mashable",tier:"Tier 2",beat:"Product News, Markets News, Funding News",themes:"Launch News, Funding News, AI Dev Tools, Large Languge Model (LLM) Training, AI Infrastructure",type:"Publication",sector:'',country:'',notes:''},
-  {id:uid(),name:"Chance Townsend",email:"chance.townsend@ziffmedia.com",outlet:"Mashable",tier:"Tier 2",beat:"Funding News, Markets News, Product News",themes:"AI Applications, Funding News, AI Policy & Regulation, Launch News, Expert Commentary, AI Infrastructure",type:"Publication",sector:'',country:'',notes:''},
-  {id:uid(),name:"Hayden Field",email:"hayden.field@theverge.com",outlet:"The Verge",tier:"Tier 2",beat:"Markets News, Funding News",themes:"AI Applications, Funding News, AI Policy & Regulation, Machine Learning",type:"Publication",sector:'',country:'',notes:''},
-  {id:uid(),name:"Robert Hart",email:"robert.hart@theverge.com",outlet:"The Verge",tier:"Tier 2",beat:"Funding News, Markets News, Product News",themes:"AI Infrastructure, Funding News, Launch News, AI Dev Tools, AI Applications",type:"Publication",sector:'',country:'',notes:''},
-  {id:uid(),name:"Lily Hay Newman",email:"lily_newman@wired.com",outlet:"Wired",tier:"Tier 2",beat:"Product News, Markets News",themes:"AI Applications, AI Policy & Regulation, AI Infrastructure",type:"Publication",sector:'',country:'',notes:''},
-  {id:uid(),name:"Benj Edwards",email:"benj.edwards@arstechnica.com",outlet:"ArsTechnica",tier:"Tier 3",beat:"Funding News, Markets News",themes:"AI Policy & Regulation, AI Infrastructure, AI Applications, Funding News",type:"Publication",sector:'',country:'',notes:''},
-  {id:uid(),name:"Dan Goodin",email:"dan.goodin@arstechnica.com",outlet:"ArsTechnica",tier:"Tier 3",beat:"Funding News, Markets News, Product News",themes:"Large Languge Model (LLM) Training, Launch News, AI Applications",type:"Publication",sector:'',country:'',notes:''},
-  {id:uid(),name:"Rebecca Bellan",email:"rebecca.bellan@techcrunch.com",outlet:"TechCrunch",tier:"Tier 3",beat:"Funding News",themes:"Funding News, Launch News",type:"Publication",sector:'',country:'',notes:''},
-  {id:uid(),name:"Russell Brandon",email:"russell.brandom@techcrunch.com",outlet:"TechCrunch",tier:"Tier 3",beat:"Product News, Markets News",themes:"AI Infrastructure, Large Languge Model (LLM) Training, AI Dev Tools",type:"Publication",sector:'',country:'',notes:''},
-  {id:uid(),name:"Harry McCracken",email:"hmccracken@fastcompany.com",outlet:"Fast Co",tier:"Tier 3",beat:"Product News, Funding News, Markets News",themes:"AI Infrastructure, Machine Learning, Funding News, AI Dev Tools",type:"Publication",sector:'',country:'',notes:''},
-  {id:uid(),name:"Mark Sullivan",email:"sullivan@fastcompany.com",outlet:"Fast Co",tier:"Tier 3",beat:"Funding News, Product News",themes:"Expert Commentary, Launch News, Funding News",type:"Publication",sector:'',country:'',notes:''},
-  {id:uid(),name:"Jacob Roach",email:"jacob.roach@digitaltrends.com",outlet:"Digital Trends",tier:"",beat:"Product News",themes:"AI Applications, AI Dev Tools",type:"Publication",sector:'',country:'',notes:''},
-  {id:uid(),name:"Eric Avidon",email:"eavidon@techtarget.com",outlet:"TechTarget",tier:"",beat:"Funding News, Markets News",themes:"Expert Commentary, Launch News, Funding News",type:"Publication",sector:'',country:'',notes:''},
-  {id:uid(),name:"Michael Nuñez",email:"michael.nunez@venturebeat.com",outlet:"VentureBeat",tier:"",beat:"Product News, Funding News",themes:"AI Infrastructure, AI Applications, Funding News",type:"Publication",sector:'',country:'',notes:''},
-  {id:uid(),name:"Sean Michael Kerner",email:"pitch@technologyjournalist.com",outlet:"VentureBeat",tier:"",beat:"Markets News, Product News",themes:"AI Applications, Machine Learning, AI Infrastructure, AI Dev Tools",type:"Publication",sector:'',country:'',notes:''},
-  {id:uid(),name:"Paul Gillin",email:"paul@siliconangle.com",outlet:"Silicon Angle",tier:"",beat:"Product News, Funding News, Markets News",themes:"AI Infrastructure, Funding News, AI Applications, Launch News",type:"Publication",sector:'',country:'',notes:''},
-  {id:uid(),name:"Mike Wheatley",email:"Mike@SiliconANGLE.com",outlet:"Silicon Angle",tier:"",beat:"Markets News, Product News, Funding News",themes:"AI Infrastructure, AI Dev Tools, Funding News, Machine Learning, Expert Commentary",type:"Publication",sector:'',country:'',notes:''},
-  {id:uid(),name:"Duncan Riley",email:"duncan@siliconangle.com",outlet:"Silicon Angle",tier:"",beat:"Product News, Funding News, Markets News",themes:"AI Infrastructure, Machine Learning, Funding News, AI Dev Tools",type:"Publication",sector:'',country:'',notes:''},
-  {id:uid(),name:"Richard MacManus",email:"richard@thenewstack.io",outlet:"The New Stack",tier:"Tier 3",beat:"Funding News, Markets News, Product News",themes:"AI Infrastructure, Machine Learning, AI Applications, Expert Commentary",type:"Publication",sector:'',country:'',notes:''},
-  {id:uid(),name:"Matthew Finnegan",email:"matthew_finnegan@foundryco.com",outlet:"Computerworld",tier:"",beat:"Product News, Funding News",themes:"Funding News, AI Dev Tools, Launch News",type:"Publication",sector:'',country:'',notes:''},
-  {id:uid(),name:"Micheal Chukwube",email:"chukwubemicheal@gmail.com",outlet:"DZone",tier:"",beat:"Product News, Funding News",themes:"AI Infrastructure, AI Dev Tools, Launch News, Funding News",type:"Publication",sector:'',country:'',notes:''},
-  {id:uid(),name:"Bobur Umurzokov",email:"iamboburdevrel@gmail.com",outlet:"DZone",tier:"",beat:"Product News, Markets News",themes:"Machine Learning, AI Infrastructure, Large Languge Model (LLM) Training, AI Dev Tools",type:"Publication",sector:'',country:'',notes:''},
-  {id:uid(),name:"M. Nadia Vincent",email:"nvincent@digitaltransformationleaders.com",outlet:"InfoQ",tier:"",beat:"Markets News",themes:"Expert Commentary, AI Infrastructure",type:"Publication",sector:'',country:'',notes:''},
-  {id:uid(),name:"Serdar Yegulalp",email:"serdar_yegulalp@foundryco.com",outlet:"InfoWorld",tier:"",beat:"Product News, Funding News",themes:"Launch News, Funding News, Large Languge Model (LLM) Training, Machine Learning",type:"Publication",sector:'',country:'',notes:''},
-  {id:uid(),name:"Ashok Goel",email:"goel@cc.gatech.edu",outlet:"AI Magazine",tier:"",beat:"Markets News, Product News, Funding News",themes:"Machine Learning, Large Languge Model (LLM) Training, AI Applications, Funding News, AI Policy & Regulation, Expert Commentary, Launch News",type:"Publication",sector:'',country:'',notes:''},
-  {id:uid(),name:"Tim King",email:"tking@solutionsreview.com",outlet:"Solutions Review",tier:"",beat:"Markets News, Funding News, Product News",themes:"Machine Learning, AI Applications, Funding News, Expert Commentary, AI Policy & Regulation",type:"Publication",sector:'',country:'',notes:''},
-  {id:uid(),name:"Isaac Sacolick",email:"isaac@starcio.com",outlet:"CIO Dive",tier:"",beat:"Product News, Funding News, Markets News",themes:"AI Infrastructure, Large Languge Model (LLM) Training, Launch News, AI Dev Tools, Funding News",type:"Publication",sector:'',country:'',notes:''},
-  {id:uid(),name:"Kyle Wiggers",email:"kylew@allenai.org",outlet:"TechCrunch Newsletter",tier:"Tier 1",beat:"Funding News, Markets News",themes:"Funding News, Launch News, AI Infrastructure",type:"Newsletter",sector:'',country:'',notes:''},
-  {id:uid(),name:"Amanda Silberling",email:"amanda@techcrunch.com",outlet:"TechCrunch Newsletter",tier:"Tier 1",beat:"Funding News, Markets News",themes:"Funding News, Launch News",type:"Newsletter",sector:'',country:'',notes:''},
-  {id:uid(),name:"Sarah Perez",email:"sarahp@techcrunch.com",outlet:"TechCrunch Newsletter",tier:"Tier 1",beat:"Funding News, Markets News",themes:"Launch News, Funding News, AI Policy & Regulation",type:"Newsletter",sector:'',country:'',notes:''},
-  {id:uid(),name:"Dylan Patel",email:"Dsp@SemiAnalysis.com",outlet:"Semianalysis Newsletter",tier:"Tier 1",beat:"Product News, Markets News",themes:"AI Applications, AI Policy & Regulation, Machine Learning",type:"Newsletter",sector:'',country:'',notes:''},
-  {id:uid(),name:"Ben Tossell",email:"ben.tossell@gmail.com",outlet:"Ben Bites",tier:"Tier 1",beat:"Product News, Markets News",themes:"AI Dev Tools, AI Applications, Large Languge Model (LLM) Training, Machine Learning",type:"Newsletter",sector:'',country:'',notes:''},
-  {id:uid(),name:"Zach Mink",email:"zach@therundown.ai",outlet:"The Rundown AI",tier:"Tier 1",beat:"Product News, Markets News, Funding News",themes:"AI Dev Tools, AI Applications, Launch News, Expert Commentary, AI Infrastructure",type:"Newsletter",sector:'',country:'',notes:''},
-  {id:uid(),name:"Rowan Cheung",email:"rowan@therundown.ai",outlet:"The Rundown AI",tier:"Tier 1",beat:"Product News, Markets News, Funding News",themes:"AI Infrastructure, AI Applications, Funding News, Launch News",type:"Newsletter",sector:'',country:'',notes:''},
-  {id:uid(),name:"Zain Kahn",email:"zain@superhuman.ai",outlet:"Superhuman AI",tier:"Tier 1",beat:"Funding News, Markets News, Product News",themes:"Funding News, AI Applications, Large Languge Model (LLM) Training, Machine Learning, AI Infrastructure, Expert Commentary",type:"Newsletter",sector:'',country:'',notes:''},
-  {id:uid(),name:"Staff",email:"hello@tldr.tech",outlet:"TLDR AI",tier:"Tier 1",beat:"Product News, Markets News, Funding News",themes:"AI Infrastructure, Machine Learning, AI Applications, Large Languge Model (LLM) Training, Launch News, Funding News, AI Dev Tools",type:"Newsletter",sector:'',country:'',notes:''},
-  {id:uid(),name:"Info Desk",email:"info@cbinsights.com",outlet:"CB Insights",tier:"Tier 1",beat:"Markets News, Funding News",themes:"Funding News, Launch News, AI Policy & Regulation, AI Advancements",type:"Newsletter",sector:'',country:'',notes:''},
-  {id:uid(),name:"Marija Gavrilov",email:"marija@exponentialview.co",outlet:"Exponential View",tier:"Tier 2",beat:"Funding News, Markets News, Product News",themes:"AI Applications, Machine Learning, AI Infrastructure, Expert Commentary",type:"Newsletter",sector:'',country:'',notes:''},
-  {id:uid(),name:"Azeem Azhar",email:"azeem.azhar@exponentialview.co",outlet:"Exponential View",tier:"Tier 2",beat:"Product News, Markets News",themes:"AI Infrastructure, Large Languge Model (LLM) Training, AI Applications, Launch News",type:"Newsletter",sector:'',country:'',notes:''},
-  {id:uid(),name:"Sebastian Raschka",email:"mail@sebastianraschka.com",outlet:"Ahead of AI",tier:"Tier 2",beat:"Product News, Markets News",themes:"AI Applications, Large Languge Model (LLM) Training, Machine Learning, AI Dev Tools",type:"Newsletter",sector:'',country:'',notes:''},
-  {id:uid(),name:"Jack Clark",email:"jack@jack-clark.net",outlet:"ImportAI",tier:"Tier 3",beat:"Product News, Markets News",themes:"AI Applications, AI Dev Tools, Machine Learning, AI Infrastructure",type:"Newsletter",sector:'',country:'',notes:''},
-  {id:uid(),name:"News Desk",email:"crew@morningbrew.com",outlet:"Tech Brew",tier:"",beat:"Markets News",themes:"AI Infrastructure, AI Advancements",type:"Newsletter",sector:'',country:'',notes:''},
-  {id:uid(),name:"Patrick Kulp",email:"pkulp@morningbrew.com",outlet:"Tech Brew",tier:"",beat:"Funding News, Markets News",themes:"Funding News, AI Applications, Machine Learning",type:"Newsletter",sector:'',country:'',notes:''},
-  {id:uid(),name:"Margarita Noriega",email:"margarita@morningbrew.com",outlet:"Tech Brew",tier:"",beat:"Funding News, Markets News",themes:"Funding News, Launch News",type:"Newsletter",sector:'',country:'',notes:''},
-  {id:uid(),name:"Annie Saunders",email:"annie@morningbrew.com",outlet:"Tech Brew",tier:"",beat:"Funding News, Markets News",themes:"Funding News, Launch News",type:"Newsletter",sector:'',country:'',notes:''},
-  {id:uid(),name:"John Desmond",email:"jdesmond@capenews.net",outlet:"AI in Business",tier:"",beat:"Markets News, Funding News",themes:"AI Infrastructure, Expert Commentary, AI Policy & Regulation",type:"Newsletter",sector:'',country:'',notes:''},
-  {id:uid(),name:"Andrey Kurenkov",email:"andreyvkurenkov@gmail.com",outlet:"Last Week in AI",tier:"",beat:"Markets News, Product News, Funding News",themes:"AI Infrastructure, AI Applications, AI Policy & Regulation",type:"Newsletter",sector:'',country:'',notes:''},
-  {id:uid(),name:"Rashi Shrivastava",email:"rshrivastava@forbes.com",outlet:"The Prompt",tier:"",beat:"Funding News, Markets News",themes:"AI Infrastructure, AI Advancements",type:"Newsletter",sector:'',country:'',notes:''},
-  {id:uid(),name:"Cory Weinberg",email:"cory@theinformation.com",outlet:"Dealmaker",tier:"",beat:"Funding News, Markets News",themes:"AI Infrastructure, AI Advancements",type:"Newsletter",sector:'',country:'',notes:''},
-  {id:uid(),name:"Natasha Mascarenhas",email:"nkmasc@gmail.com",outlet:"Dealmaker",tier:"",beat:"Funding News, Markets News",themes:"AI Infrastructure, AI Advancements",type:"Newsletter",sector:'',country:'',notes:''},
-  {id:uid(),name:"Connie Loizos",email:"connie@strictlyvc.com",outlet:"StrictlyVC",tier:"",beat:"Markets News, Funding News",themes:"Funding News",type:"Newsletter",sector:'',country:'',notes:''},
-  {id:uid(),name:"Support Desk",email:"support@datadrivenvc.io",outlet:"Data Driven VC",tier:"",beat:"Markets News, Funding News, Product News",themes:"Funding News, AI Infrastructure",type:"Newsletter",sector:'',country:'',notes:''},
-  {id:uid(),name:"Ron Schmelzer",email:"ron@cognilytica.com",outlet:"AI Today Podcast",tier:"Tier 1",beat:"Markets News, Funding News",themes:"AI Infrastructure, Funding News, AI Policy & Regulation, Expert Commentary",type:"Podcast",sector:'',country:'',notes:''},
-  {id:uid(),name:"Jack Rhysider",email:"jack@darknetdiaries.com",outlet:"Darknet Diaries",tier:"Tier 1",beat:"Markets News, Funding News, Product News",themes:"AI Applications, Funding News, AI Infrastructure",type:"Podcast",sector:'',country:'',notes:''},
-  {id:uid(),name:"Nilay Patel",email:"nilay@theverge.com",outlet:"Decoder / The Verge",tier:"Tier 1",beat:"Markets News, Funding News, Product News",themes:"AI Applications, AI Dev Tools, Funding News, Large Languge Model (LLM) Training, Machine Learning, AI Policy & Regulation",type:"Podcast",sector:'',country:'',notes:''},
-  {id:uid(),name:"Andrew Marino",email:"andrew.marino@theverge.com",outlet:"The Vergecast",tier:"Tier 1",beat:"Markets News, Product News, Funding News",themes:"AI Applications, AI Policy & Regulation, Launch News, AI Infrastructure",type:"Podcast",sector:'',country:'',notes:''},
-  {id:uid(),name:"Allison Ryder",email:"amryder@mit.edu",outlet:"Me, Myself & AI",tier:"Tier 1",beat:"Product News, Markets News, Funding News",themes:"Machine Learning, Large Languge Model (LLM) Training, AI Dev Tools, Expert Commentary",type:"Podcast",sector:'',country:'',notes:''},
-  {id:uid(),name:"Sam Ransbotham",email:"sam.ransbotham@bc.edu",outlet:"Me, Myself & AI",tier:"Tier 1",beat:"Product News, Markets News, Funding News",themes:"AI Infrastructure, Machine Learning, Launch News, AI Applications, AI Dev Tools",type:"Podcast",sector:'',country:'',notes:''},
-  {id:uid(),name:"Steve Gibson",email:"SecurityNow@grc.com",outlet:"Security Now",tier:"Tier 1",beat:"Product News, Markets News",themes:"Machine Learning, AI Infrastructure, AI Policy & Regulation",type:"Podcast",sector:'',country:'',notes:''},
-  {id:uid(),name:"Noah Kravitz",email:"noah.kravitz@gmail.com",outlet:"NVIDIA AI Podcast",tier:"Tier 2",beat:"Markets News, Funding News",themes:"Machine Learning, AI Infrastructure, Expert Commentary, AI Applications",type:"Podcast",sector:'',country:'',notes:''},
-  {id:uid(),name:"Lee Atchison",email:"lee@atchisontechnology.com",outlet:"Software Engineering Daily",tier:"Tier 3",beat:"Product News, Funding News, Markets News",themes:"Machine Learning, AI Infrastructure, Expert Commentary, Funding News, AI Dev Tools",type:"Podcast",sector:'',country:'',notes:''},
-  {id:uid(),name:"Shawn Wang",email:"swyx@swyx.io",outlet:"Latent Space",tier:"Tier 3",beat:"Markets News, Funding News",themes:"AI Infrastructure, AI Policy & Regulation, Launch News, Funding News",type:"Podcast",sector:'',country:'',notes:''},
-  {id:uid(),name:"Sam Charrington",email:"sam@twimlai.com",outlet:"The TWIML AI Podcast",tier:"Tier 3",beat:"Product News, Funding News, Markets News",themes:"AI Infrastructure, Machine Learning, Funding News, AI Applications, AI Policy & Regulation",type:"Podcast",sector:'',country:'',notes:''},
-  {id:uid(),name:"Jon Krohn",email:"now@jonkrohn.com",outlet:"Super Data Science: ML & AI",tier:"Tier 3",beat:"Markets News, Product News, Funding News",themes:"Expert Commentary, Launch News, AI Dev Tools, AI Applications, Machine Learning, AI Infrastructure",type:"Podcast",sector:'',country:'',notes:''},
-  {id:uid(),name:"Nathaniel Whittemore",email:"nlw@whittemore.io",outlet:"The AI Breakdown",tier:"",beat:"Markets News, Funding News, Product News",themes:"Launch News, Machine Learning",type:"Podcast",sector:'',country:'',notes:''},
-  {id:uid(),name:"Paul Roetzer",email:"paul@readynorth.com",outlet:"The Artificial Intelligence Show",tier:"",beat:"Product News, Markets News, Funding News",themes:"AI Applications, Machine Learning, AI Infrastructure, Expert Commentary",type:"Podcast",sector:'',country:'',notes:''},
-  {id:uid(),name:"Daniel Bashir",email:"editor@thegradient.pub",outlet:"The Gradient Podcast",tier:"",beat:"Markets News, Funding News, Product News",themes:"Machine Learning, AI Infrastructure, Funding News, AI Applications, AI Dev Tools, Launch News",type:"Podcast",sector:'',country:'',notes:''},
-  {id:uid(),name:"Anil Das-Gupta",email:"anil@naavik.co",outlet:"Deconstructor of Fun",tier:"",beat:"Product News, Markets News, Funding News",themes:"Large Languge Model (LLM) Training, Machine Learning",type:"Podcast",sector:'',country:'',notes:''},
-  {id:uid(),name:"Ryan Sean Adams",email:"ryan@banklesshq.com",outlet:"Bankless",tier:"",beat:"Product News, Markets News, Funding News",themes:"Launch News, Expert Commentary, Machine Learning",type:"Podcast",sector:'',country:'',notes:''},
-  {id:uid(),name:"Sebastien Couture",email:"sebastien@epicenter.tv",outlet:"Epicenter",tier:"",beat:"Markets News, Funding News, Product News",themes:"AI Policy & Regulation, AI Dev Tools, AI Applications, Machine Learning, Large Languge Model (LLM) Training",type:"Podcast",sector:'',country:'',notes:''},
-  {id:uid(),name:"Cleo Abram",email:"cleo@hugeiftrueshow.com",outlet:"Big Technology Podcast",tier:"",beat:"Markets News",themes:"AI Infrastructure, AI Policy & Regulation, AI Applications",type:"Podcast",sector:'',country:'',notes:''},
-  {id:uid(),name:"Tim Scarfe",email:"freelancers@mlst.ai",outlet:"Machine Learning Street Talk",tier:"",beat:"Markets News, Funding News, Product News",themes:"AI Applications, Funding News, Machine Learning, AI Infrastructure, Large Languge Model (LLM) Training",type:"Podcast",sector:'',country:'',notes:''},
-  {id:uid(),name:"Jerod Santo",email:"jerod.santo@gmail.com",outlet:"Practical AI",tier:"",beat:"Product News, Markets News",themes:"AI Policy & Regulation, AI Infrastructure, Machine Learning",type:"Podcast",sector:'',country:'',notes:''},
-  {id:uid(),name:"Scott Wapner",email:"scott.wapner@versantmedia.com",outlet:"CNBC Closing Bell",tier:"Tier 3",beat:"Markets News, Funding News",themes:"AI Infrastructure, Launch News, AI Policy & Regulation",type:"Broadcast",sector:'',country:'',notes:''},
-  {id:uid(),name:"Donna Burton",email:"donna.burton@versantmedia.com",outlet:"CNBC Closing Bell",tier:"Tier 3",beat:"Markets News",themes:"AI Infrastructure, AI Policy & Regulation",type:"Broadcast",sector:'',country:'',notes:''},
-  {id:uid(),name:"Andrew Ross Sorkin",email:"arsorkin@nytimes.com",outlet:"CNBC Squawk Box",tier:"Tier 3",beat:"Funding News, Markets News, Product News",themes:"Expert Commentary, AI Infrastructure, Funding News, Machine Learning",type:"Broadcast",sector:'',country:'',notes:''},
-  {id:uid(),name:"Rebecca Quick",email:"rebecca.quick@versantmedia.com",outlet:"CNBC Squawk Box",tier:"Tier 3",beat:"Markets News, Funding News",themes:"AI Infrastructure, Expert Commentary, AI Policy & Regulation",type:"Broadcast",sector:'',country:'',notes:''},
-  {id:uid(),name:"Seth Fiegerman",email:"sfiegerman@bloomberg.net",outlet:"Bloomberg Tech",tier:"",beat:"Markets News, Funding News, Product News",themes:"Machine Learning, AI Dev Tools, Expert Commentary, Large Languge Model (LLM) Training, Funding News",type:"Broadcast",sector:'',country:'',notes:''},
-  {id:uid(),name:"Mackenzie Hawkins",email:"mhawkins71@bloomberg.net",outlet:"Bloomberg Tech Asia",tier:"",beat:"Markets News",themes:"AI Infrastructure, Expert Commentary",type:"Broadcast",sector:'',country:'',notes:''},
-  {id:uid(),name:"Tom Mackenzie",email:"tmackenzie5@bloomberg.net",outlet:"Bloomberg Tech Europe",tier:"",beat:"Markets News",themes:"AI Infrastructure, AI Policy & Regulation",type:"Broadcast",sector:'',country:'',notes:''},
-  {id:uid(),name:"Maria Boden",email:"maria.boden@versantmedia.com",outlet:"CNBC Tech Check",tier:"",beat:"Markets News",themes:"AI Infrastructure, Expert Commentary, AI Policy & Regulation",type:"Broadcast",sector:'',country:'',notes:''},
-  {id:uid(),name:"Deirdre Bosa",email:"deirdre.bosa@versantmedia.com",outlet:"CNBC Tech Check",tier:"",beat:"Markets News, Funding News, Product News",themes:"AI Infrastructure, AI Policy & Regulation, Launch News, Machine Learning",type:"Broadcast",sector:'',country:'',notes:''},
-  {id:uid(),name:"Judy Khan Shaw",email:"judy.shaw@nyse.com",outlet:"NYSE Live",tier:"",beat:"Markets News, Product News, Funding News",themes:"AI Infrastructure, AI Policy & Regulation",type:"Broadcast",sector:'',country:'',notes:''},
-  {id:uid(),name:"Kristen Scholer",email:"kristen.scholer@ice.com",outlet:"NYSE Live",tier:"",beat:"Markets News",themes:"AI Infrastructure, AI Policy & Regulation",type:"Broadcast",sector:'',country:'',notes:''},
-  {id:uid(),name:"Maria Bartiromo",email:"maria.bartiromo@fox.com",outlet:"FOX Business Mornings with Maria",tier:"",beat:"Markets News",themes:"AI Policy & Regulation, Expert Commentary",type:"Broadcast",sector:'',country:'',notes:''},
-  {id:uid(),name:"Sarah Caulfield",email:"sarah@foxbusiness.com",outlet:"FOX Business Mornings with Maria",tier:"",beat:"Markets News",themes:"Expert Commentary, AI Infrastructure",type:"Broadcast",sector:'',country:'',notes:''},
-  {id:uid(),name:"Stuart Varney",email:"stuart.varney@foxbusiness.com",outlet:"FOX Varney & Co",tier:"",beat:"Markets News, Funding News",themes:"AI Infrastructure, AI Policy & Regulation, Expert Commentary",type:"Broadcast",sector:'',country:'',notes:''},
-  {id:uid(),name:"Garrett Collins",email:"garrett.collins@foxbusiness.com",outlet:"FOX Varney & Co",tier:"",beat:"Markets News, Funding News",themes:"AI Infrastructure, AI Policy & Regulation, Expert Commentary",type:"Broadcast",sector:'',country:'',notes:''},
-  {id:uid(),name:"Jill Malandrino",email:"jill.malandrino@nasdaq.com",outlet:"NASDAQ Trade Talks",tier:"Tier 1",beat:"Markets News, Funding News",themes:"AI Infrastructure, AI Policy & Regulation, Expert Commentary",type:"Broadcast",sector:'',country:'',notes:''},
-  {id:uid(),name:"Nikolai Kuznetsov",email:"nikolai.kuznetsov@nasdaq.com",outlet:"NASDAQ Trade Talks",tier:"Tier 1",beat:"Markets News, Funding News",themes:"AI Infrastructure, Launch News, Funding News",type:"Broadcast",sector:'',country:'',notes:''},
-  {id:uid(),name:"Michael Liedtke",email:"mliedtke@ap.org",outlet:"Cheddar TV",tier:"",beat:"Markets News, Funding News",themes:"AI Dev Tools, Launch News, Expert Commentary, Large Languge Model (LLM) Training, Machine Learning",type:"Broadcast",sector:'',country:'',notes:''},
-  {id:uid(),name:"Matt O'Brien",email:"mobrien@ap.org",outlet:"Cheddar TV",tier:"",beat:"Product News, Markets News, Funding News",themes:"AI Infrastructure, Machine Learning",type:"Broadcast",sector:'',country:'',notes:''},
-  {id:uid(),name:"Kelvin Chan",email:"kchan@ap.org",outlet:"Cheddar TV",tier:"",beat:"Markets News, Funding News",themes:"Machine Learning, Large Languge Model (LLM) Training, Launch News, AI Dev Tools",type:"Broadcast",sector:'',country:'',notes:''},
-];
+const SEED_DATA=[];
 
-const SEED_CONFERENCES=[
-  {id:uid(),name:"CES (Consumer Electronics Show)",month:"January",startDate:"2026-01-06",endDate:"2026-01-09",audience:"Developers, Investors, Enterprises",themes:"AI Infrastructure, AI Applications",organizer:"CES (no specific contact provided) — media@cta.tech",notes:"Speakers: Jason Calacanis (Internet Entrepreneur), Bob Sternfels (Global Managing Partner at McKinsey & Company) - full list here"},
-  {id:uid(),name:"AAAI",month:"January",startDate:"2026-01-20",endDate:"2026-01-27",audience:"Developers, Enterprises, Investors",themes:"AI Infrastructure, AI Applications, Agentic AI",organizer:"The Association for the Advancement of Artificial Intelligence (did not see specific contact) — aaai26@aaai.org",notes:"Speakers: Peter Stone (Chief Scientist of Sony AI), Bowen Zhou (President of JD Cloud & AI) - full list here"},
-  {id:uid(),name:"AI & Big Data Expo Global",month:"February",startDate:"2026-02-04",endDate:"2026-02-05",audience:"Enterprises, Developers, Investors",themes:"AI Infrastructure, AI Applications, Agentic AI, AI Ethics & Policy",organizer:"AI & Big Data Expo Global (did not see exact contact info) — ai@techexevent.com",notes:"Speakers: Konstantina Kapetandidi (VP of Global Data Solutions and Head of Data Science, Europe for Visa), Shekkhar Kullarni (Chief Architecy, Deutsche Telekom) - full list here"},
-  {id:uid(),name:"World AI Cannes Festival",month:"February",startDate:"2026-02-12",endDate:"2026-02-13",audience:"Investors, Developers, Enterprises",themes:"AI Infrastructure, AI Applications, AI Ethics & Policy, Agentic AI",organizer:"Justine Ba — justine@publicstudio.fr",notes:"Speakers: Andrea Laghi (Director of the Department of Diagnostic Imagining at Humanitas), Arnaud Jean (Senior Solutions Architect at AWS) - full list here"},
-  {id:uid(),name:"NVIDIA GTC",month:"March",startDate:"2026-03-16",endDate:"2026-03-19",audience:"Developers, Investors, Enterprises",themes:"AI Infrastructure, AI Applications, AI Ethics & Policy",organizer:"NVIDIA GTC (didn't see specific contact) — GTC_registration@nvidia.com or info@nvidia.com",notes:"Speakers: 2026 speakers yet to be announced but 2025 included: Frances Arnold (Nobel Laureate in Chemistry + Professor at California Insitute of Technology), RJ Scaringe (Founder and CEO of Rivian), Yann LeCun (Chief AI Scientist at Meta + NYU Professor) - full link here"},
-  {id:uid(),name:"HumanX",month:"April",startDate:"2026-04-06",endDate:"2026-04-09",audience:"Enterprises, Investors, Developers",themes:"AI Infrastructure, AI Applications, Agentic AI, AI Ethics & Policy",organizer:"Stefan Weitz — stefan@humanx.com",notes:"Speakers: Matt Garman (CEO of Amazon Web Services), Sarah Guo (Founder and General Partner at Conviction), Al Gore (Founding Partner and Chairman of Generation Investment Management) - full list here"},
-  {id:uid(),name:"Google Cloud Next",month:"April",startDate:"2026-04-22",endDate:"2026-04-24",audience:"Developers, Investors, Enterprises",themes:"AI Infrastructure, AI Applications",organizer:"Google Summit (no specific contact provided) — next26analystsummit@google.com",notes:"Speakers: Thomas Kurian (CEO of Google Cloud), Hayete Gallot (President, Customer Experience at Google Cloud) - full list here"},
-  {id:uid(),name:"EmTech AI (MIT)",month:"April",startDate:"2026-04-21",endDate:"2026-04-23",audience:"Developers, Investors, Enterprises",themes:"AI Applications, AI Infrastructure, Agentic AI",organizer:"EmTech AI (MIT) (did not see specific person listed) — eventsreg@technologyreview.com",notes:"Speakers: 2026 speakers not live yet but 2025 included: Robert Bench (CEO & Cofounder of Radius Technology Systems), Santanu\nBhattacharya (Scientist at MIT Media Lab), Rodney Brooks (Cofounder and CTO, Robust.AI; Cofounder of iRobot) - full list here"},
-  {id:uid(),name:"ODSC – Open Data Science Conference",month:"April",startDate:"2026-04-28",endDate:"2026-04-30",audience:"Enterprises, Developers",themes:"AI Infrastructure, AI Applications",organizer:"ODSC AI (did not see specific person to contact) — info@odsc.com",notes:"Speakers: 2026 list not available, 2025 included: Harrison Chase (CEO and Co-Founder of Langchain), Lora Aroyo (Senior Research Scientist for Google Deepmind) - full list here"},
-  {id:uid(),name:"Ai Everything Global Summit",month:"May",startDate:"2026-05-11",endDate:"2026-05-13",audience:"Developers, Investors, Enterprises",themes:"AI Infrastructure, AI Applications, Agentic AI, AI Ethics & Policy",organizer:"AI Everything Global (did not see specific contact) — sales@aieverythingglobal.com",notes:"Speakers: 2026 list not available, 2025 included: Chloe Bakal (Chief AI Ethicist (Meta), Dr. Chaouki Kasmi (Chief Innovation Officer for TII) - full list here"},
-  {id:uid(),name:"Embedded Vision Summit",month:"May",startDate:"2026-05-19",endDate:"2026-05-21",audience:"Developers, Enterprises",themes:"AI Infrastructure, AI Applications",organizer:"Embedded Vision Summit (did not see a contact person) — nfo@edge-ai-vision.com",notes:"Speakers: Trevor Darrell (Professor at UC, Berkeley), Gérard Medioni (Vice President and Distinguished Scientist, Amazon Prime Video and Studios) - full list here"},
-  {id:uid(),name:"Italy AI Week",month:"May",startDate:"2026-05-19",endDate:"2026-05-20",audience:"Developers, Investors, Enterprises",themes:"AI Infrastructure, AI Applications, AI Ethics & Policy, Agentic AI",organizer:"AI Week (no specific person listed) — info@aiweek.it",notes:"Speakers: Advait Sarkar (Senior Researcher at Microsoft), Karen Hao (Journalist, Author of the New York Times bestseller “Empire of A” - The Atlantic) - full list here"},
-  {id:uid(),name:"The AI Summit London",month:"June",startDate:"2026-06-10",endDate:"2026-06-11",audience:"Developers, Enterprises",themes:"AI Infrastructure, AI Applications",organizer:"Caroline Hicks — caroline.hicks@informa.com",notes:"Speakers: Rodrigo Liang (Co-founder and CEO, SambaNova Systems), Marilyn Chaplin (Former Chief Human Resources Officer, NTT), David Norris (Chief Growth Officer, Holiday Extras), (link to the full list)"},
-  {id:uid(),name:"Data + AI Summit",month:"June",startDate:"2026-06-15",endDate:"2026-06-18",audience:"Developers, Investors, Enterprises",themes:"AI Infrastructure, AI Applications",organizer:"Databricks (didn't see specific contact listed) — dataaisummit@regsvc.com",notes:"Speakers: Adam Levine (Staff Software Engineer, Databricks), Aiden Lee (CTO and Co-Founder of Twelve Labs, Inc) - full list here"},
-  {id:uid(),name:"Super AI",month:"June",startDate:"2026-06-10",endDate:"2026-06-11",audience:"Developers, Enterprises",themes:"AI Infrastructure, AI Applications",organizer:"Super AI (specific contact not found) — ecosystem@superai.com",notes:"Speakers: Balaji Srinivasan (Founder, Investor and Author for The Network State), Dwarkesh Patel (Host of the Dwarkesh Podcast), Tao Cheung (Co-Founder of Manus AI) - full list here"},
-  {id:uid(),name:"AI Con",month:"June",startDate:"2026-06-07",endDate:"2026-06-12",audience:"Investors, Developers, Enterprises",themes:"AI Infrastructure, AI Applications, AI Ethics & Policy, Agentic AI",organizer:"Coveros (did not see a specific contact) — clientsupport@coveros.com",notes:"Speakers: Jonathan Miller Kauffman (Senior Consultant for Coveros, Inc), Jeff Pierce (Managing Consultant for Coveros) - full list here"},
-  {id:uid(),name:"Raise Summit",month:"July",startDate:"2026-07-08",endDate:"2026-07-09",audience:"Developers, Investors, Enterprises",themes:"AI Applications, AI Ethics & Policy, AI Infrastructure",organizer:"Raise Summit (did not see a specific person) — support@raisesummit.com",notes:"Speakers: Eric Schmidt (Executive Chairman & CEO of Relativity Space), Nikesh Arora (CEO and Chairperson of Palo Alto Networks) - full list here"},
-  {id:uid(),name:"Ai4",month:"August",startDate:"2026-08-04",endDate:"2026-08-06",audience:"Developers, Enterprises",themes:"AI Infrastructure, AI Applications",organizer:"Glenn Morizio — glenn@ai4.co",notes:"Speakers: Geoffrey Hinton (Nobel Prize Winner & \"Godfather of AI\"), Fei-Fei Li (Co-Founder, CEO & \"Godmother of AI\"), Prashant Mehrotra (Chief AI Officer of US Bank) - full list here"},
-  {id:uid(),name:"IJCAI – International Joint Conference on Artificial Intelligence",month:"August",startDate:"2026-08-15",endDate:"2026-08-21",audience:"Developers, Investors",themes:"AI Applications, AI Infrastructure",organizer:"IJCAI (no specific contact listed) — pcchair@2026.ijcai.org",notes:"Speakers: 2026 not released yet but 2025 included: Rina Dechter (University of California, Irvine), Cynthia Rudin (Duke Univeristy) - full list here"},
-  {id:uid(),name:"AI Infra Summit",month:"September",startDate:"2026-09-15",endDate:"2026-09-17",audience:"Investors, Enterprises, Developers",themes:"AI Infrastructure, AI Applications, Agentic AI",organizer:"Kisaco Research (did not see a specific person listed) — events@kisacoresearch.com",notes:"Speakers: 2026 speakers not released yet but 2025 included: Alan Rosa (CISO & SVP of Technology at CVS Health), Ankur Gupta (SVP & GM at Siemens EDA) - full list here"},
-  {id:uid(),name:"All in AI",month:"September",startDate:"2026-09-16",endDate:"2026-09-17",audience:"Developers, Enterprises",themes:"AI Infrastructure, AI Applications",organizer:"All in Events (did not see a specific person mentioned) — info@allinevent.ai",notes:"Speakers: 2026 speakers not released yet but 2025 included: Philippe Achkar (Director of Expertise and Solutions at BDC), Angela Adam (SVP of Sales and Marketing for eStruxture Data Centers) - full list here"},
-  {id:uid(),name:"Finance Leaders Forum",month:"September",startDate:"2026-09-03",endDate:"2026-09-03",audience:"Investors, Enterprises",themes:"AI Infrastructure",organizer:"Caprice Jee — caprice.jee@connectmedia.com",notes:"Speakers: 2026 speakers not listed yet but 2025 included: Robin Stalker (CFO of Adidas), John Goodwin (CFO of Lego), Melissa Azzopardi (General Manager of Finance at AFL)"},
-  {id:uid(),name:"Oracle AI World",month:"October",startDate:"2026-10-26",endDate:"2026-10-29",audience:"Developers, Investors, Enterprises",themes:"AI Infrastructure, Agentic AI, AI Applications",organizer:"Oracle — oracleaiworld@regsvcoracle.com",notes:"Speakers: 2026 speakers not released yet - 2025 included: Larry Ellison (Ocacle's Chairman and CTO), Safra Catz (Oracle's CEO) and Mike Sicilla (Oracle's Co-CEO) - full list not on their website but found an article here"},
-  {id:uid(),name:"World Summit AI",month:"October",startDate:"2026-10-07",endDate:"2026-10-08",audience:"Developers, Investors, Enterprises",themes:"AI Infrastructure, Agentic AI, AI Applications",organizer:"World Summit AI (could not find specific person) — enquiries@inspired-minds.co.uk",notes:"Speakers: 2026 speakers not released yet - but 2025 included: Cassie Kosykov (Chief Decision Scientist at Google), Yann LeCun (VP & Chief AI Scientist at Meta) and Werner Vogels (VP and CTO at Amazon) - full link here"},
-  {id:uid(),name:"Adopt AI",month:"November",startDate:"2025-11-25",endDate:"2025-11-26",audience:"Developers, Investors, Enterprises",themes:"AI Infrastructure, AI Applications",organizer:"Artefact (did not see a specific person listed) — info@artefactgroup.com",notes:"Speakers: Dr. Najwa Aaraj (CEO of Technology Innovation Institute), Prof. Ian Abbs (Strategic Advisor, Former CEO for NHS)"},
-  {id:uid(),name:"AI For Marketers Summit",month:"November",startDate:"2026-11-12",endDate:"2026-11-14",audience:"Investors, Enterprises",themes:"AI Infrastructure, AI Applications",organizer:"Jessica Vargas — jessica@gsmiweb.com",notes:"Speakers: Patricia Mestre (Head of Partner Marketing for EMEA, Data&AI for Microsoft), Navneet Singh (CMO for Eightfold.ai), Colleen Romero (CMO for Swanson Health) - full list here"},
-  {id:uid(),name:"DSC Europe",month:"November",startDate:"Exact dates not given",endDate:"N/A",audience:"Investors, Enterprises",themes:"AI Infrastructure, AI Applications",organizer:"Volvo Group (did not see a specific contact) — dsc.eu@volvo.com",notes:"Speakers: 2026 speakers not live yet but 2025 included: Beth Noveck (Professor of Law and AI at Northeastern University), Manoj Tyagi (VP of Architecture and Development at DBS Bank)"},
-  {id:uid(),name:"AI 2030 Summit",month:"December",startDate:"2025-12-02",endDate:"2025-12-02",audience:"Enterprises",themes:"AI Infrastructure, AI Applications",organizer:"AI 2030 (no specific person listed) — info@ai2030.com",notes:"Speakers: Does not list upcoming speakers lineup but previously: Steve Goldberg (Partner at DYDX Capital), Wendy (Koh) Gonzalez (SEO at Sama) - full list here"},
-  {id:uid(),name:"The AI Summit New York",month:"December",startDate:"2026-12-09",endDate:"2026-12-10",audience:"Developers, Enterprises",themes:"AI Infrastructure, AI Applications",organizer:"Caroline Hicks — caroline.hicks@informa.com",notes:"Speakers: Hannah Helin (SVP of Data and Emerging Technologies, NBCUniversal), Nnanna Kalu-Mba (ICT for Development Expert, United Nations Population Fund (UNFPA)) (link to full speakers list)"},
-];
+const SEED_CONFERENCES=[];
 
 
 
