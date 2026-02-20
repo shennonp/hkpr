@@ -1212,9 +1212,10 @@ function closeAdd(){ document.getElementById('addModal').classList.remove('on');
 function saveReporter(){
   const name =document.getElementById('f-name').value.trim();
   const email=document.getElementById('f-email').value.trim();
-  if(!name||!email){ toast('Name and Email are required','e'); return; }
+  if(!name){ toast('Name is required','e'); return; }
+  const finalEmail = email || 'N/A';
   const obj={
-    id:editingId||uid(), name, email,
+    id:editingId||uid(), name, email:finalEmail,
     outlet:  document.getElementById('f-outlet').value.trim(),
     tier:    document.getElementById('f-tier').value,
     beat:    document.getElementById('f-beat').value,
@@ -1367,11 +1368,10 @@ function parseBulk(){
       else textCols.push(val);
     });
 
-    if(!assigned.email){ errs.push(`Row ${i+1}: no email found`); return; }
-
     // First text col = name, second = outlet, rest = notes
     const name   = textCols[0] || '';
     const outlet = textCols[1] || '';
+    if(!assigned.email) assigned.email = 'N/A';
     const notes  = textCols.slice(2).join(' ').trim();
 
     if(!name){ errs.push(`Row ${i+1}: missing name`); return; }
@@ -1401,7 +1401,7 @@ function parseBulk(){
 
 function saveBulk(){
   if(!bulkParsed.length) return;
-  const fresh=bulkParsed.filter(r=>!DB.reporters.some(d=>d.email.toLowerCase()===r.email.toLowerCase()));
+  const fresh=bulkParsed.filter(r=>r.email==='N/A'||!DB.reporters.some(d=>d.email!=='N/A'&&d.email.toLowerCase()===r.email.toLowerCase()));
   const dupes=bulkParsed.length-fresh.length;
   DB.reporters.push(...fresh); scheduleSave(); closeBulk(); buildAllChips(); render();
   let msg=`Added ${fresh.length} reporters`;
