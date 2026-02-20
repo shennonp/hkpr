@@ -421,13 +421,15 @@ tbody tr.selected{background:var(--red-bg) !important}
     <div class="mh"><h2>⊞ Bulk Add Reporters</h2><button class="mc" onclick="closeBulk()">✕</button></div>
     <div class="mb-body">
       <div class="bulk-info">
-        Paste your list below — one reporter per line.<br>
-        Column order: <code>Name</code> · <code>Email</code> · <code>Outlet</code> · <code>Tier</code> · <code>Beat</code> · <code>Sector</code> · <code>Country</code> · <code>Type</code> · <code>Themes</code> · <code>Notes</code><br>
-        <strong>Tip:</strong> Copy rows straight from Google Sheets or Excel. Only Name and Email are required. Themes can be semicolon-separated within a cell.
+        Paste your data from Excel or Google Sheets — one reporter per line. Then map each column below.
       </div>
       <div class="field">
-        <label>Paste your list here</label>
-        <textarea class="bulk-ta" id="bulkInput" placeholder="James Walker&#9;j.walker@ft.com&#9;Financial Times&#9;Tier 1&#9;Markets&#9;Finance&#9;UK&#9;Publication&#9;Fintech;DeFi&#9;Senior fintech reporter" oninput="parseBulk()"></textarea>
+        <label>Paste your data here</label>
+        <textarea class="bulk-ta" id="bulkInput" placeholder="Paste rows here…" oninput="onBulkPaste()"></textarea>
+      </div>
+      <div id="bulkColMapper" style="display:none">
+        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--steel);margin-bottom:8px">Map your columns</div>
+        <div id="bulkColMapRows" style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px"></div>
       </div>
       <div id="bulkPreview"></div>
       <div class="modal-actions">
@@ -534,7 +536,6 @@ const F = { tiers:new Set(), beats:new Set(), sectors:new Set(), countries:new S
 const CF = { months:new Set(), audiences:new Set(), themes:new Set(), search:'' };
 let editingId = null;
 let confEditingId = null;
-let bulkParsed = [];
 let currentTab = 'reporters';
 
 // tag inputs state
@@ -1302,101 +1303,133 @@ function deleteConf(){ confirmDelConf(document.getElementById('confDeleteBtn').d
 function openBulk(){
   document.getElementById('bulkInput').value='';
   document.getElementById('bulkPreview').innerHTML='';
+  document.getElementById('bulkColMapper').style.display='none';
+  document.getElementById('bulkColMapRows').innerHTML='';
   document.getElementById('bulkSaveBtn').disabled=true;
   document.getElementById('bulkSaveBtn').textContent='Import 0 Reporters';
-  bulkParsed=[];
+  bulkParsed=[]; bulkColMap=[]; bulkRawLines=[];
   document.getElementById('bulkModal').classList.add('on');
   setTimeout(()=>document.getElementById('bulkInput').focus(),80);
 }
 function closeBulk(){ document.getElementById('bulkModal').classList.remove('on'); }
 
 // ── Smart column sniffers ──
-const KNOWN_TIERS    = ['tier 1','tier 2','tier 3'];
-const KNOWN_TYPES    = ['publication','podcast','broadcast','magazine','newsletter'];
-const KNOWN_BEATS_KW = ['funding','product','market','launch'];
-const KNOWN_COUNTRIES= ['france','germany','uk','uae','us','usa','singapore','japan','hong kong','south korea','switzerland','thailand','other'];
-// Sectors matched by inclusion so "Crypto Trade", "Crypto News" etc. all map to Crypto
-const KNOWN_SECTORS  = ['crypto','fintech','finance','business','technology','news','mainstream','markets','ai'];
+const FIELD_OPTIONS = [
+  {val:'',       label:'— ignore —'},
+  {val:'name',   label:'Name'},
+  {val:'email',  label:'Email'},
+  {val:'outlet', label:'Outlet'},
+  {val:'tier',   label:'Tier'},
+  {val:'beat',   label:'Beat'},
+  {val:'sector', label:'Sector'},
+  {val:'country',label:'Country'},
+  {val:'type',   label:'Type'},
+  {val:'notes',  label:'Notes'},
+];
 
-function sniffCol(val){
-  const v=val.toLowerCase().trim();
-  if(v.includes('@')) return 'email';
-  if(KNOWN_TIERS.some(t=>v===t)) return 'tier';
-  if(KNOWN_TYPES.some(t=>v===t)) return 'type';
-  if(KNOWN_BEATS_KW.some(k=>v.includes(k))) return 'beat';
-  if(KNOWN_COUNTRIES.some(c=>v===c||v.startsWith(c+' ')||v.endsWith(' '+c))) return 'country';
-  // Sector: match by keyword inclusion so "Crypto Trade" -> crypto, "AI News" -> ai
-  if(KNOWN_SECTORS.some(s=>v.includes(s))) return 'sector';
-  // themes: comma/semicolon separated list
-  if((v.includes(',') || v.includes(';')) && !v.includes('@')) return 'themes';
-  return 'text';
+// Auto-guess what a column contains based on its first few values
+function guessField(samples, usedFields){
+  const vals = samples.map(s=>(s||'').toLowerCase().trim()).filter(Boolean);
+  if(!vals.length) return '';
+  const allEmail = vals.every(v=>v.includes('@') || v==='n/a' || v==='');
+  if(allEmail && vals.some(v=>v.includes('@'))) return usedFields.has('email')?'':('email');
+  if(vals.every(v=>['tier 1','tier 2','tier 3',''].includes(v))) return usedFields.has('tier')?'':('tier');
+  if(vals.every(v=>['publication','podcast','broadcast','magazine','newsletter',''].includes(v))) return usedFields.has('type')?'':('type');
+  const countries = ['france','germany','uk','uae','us','usa','singapore','japan','hong kong','south korea','switzerland','thailand','other'];
+  if(vals.every(v=>countries.includes(v)||v==='')) return usedFields.has('country')?'':('country');
+  const sectors = ['ai','crypto','fintech','finance','business','technology','news'];
+  if(vals.every(v=>sectors.some(s=>v.includes(s))||v==='')) return usedFields.has('sector')?'':('sector');
+  const beatKw = ['funding','product','market','launch'];
+  if(vals.every(v=>beatKw.some(k=>v.includes(k))||v==='')) return usedFields.has('beat')?'':('beat');
+  return '';
 }
 
-// Normalise a sniffed sector value to the canonical chip label
-function normaliseSector(val){
-  const v=val.toLowerCase();
-  if(v.includes('crypto'))  return 'Crypto';
-  if(v.includes('fintech')) return 'Fintech';
-  if(v.includes('finance')) return 'Finance';
-  if(v.includes('tech'))    return 'Technology';
-  if(v.includes('news'))    return 'News';
-  if(v.includes('business'))return 'Business';
-  if(v.includes('ai'))      return 'AI';
-  return val; // fallback keep as-is
+let bulkRawLines = [];
+let bulkColCount = 0;
+let bulkColMap   = []; // array of field names per column index
+let bulkParsed   = [];
+
+function onBulkPaste(){
+  const raw = document.getElementById('bulkInput').value;
+  bulkRawLines = raw.split('\n').map(l=>l.trim()).filter(l=>l);
+  if(!bulkRawLines.length){
+    document.getElementById('bulkColMapper').style.display='none';
+    document.getElementById('bulkPreview').innerHTML='';
+    document.getElementById('bulkSaveBtn').disabled=true;
+    document.getElementById('bulkSaveBtn').textContent='Import 0 Reporters';
+    return;
+  }
+  // Detect columns from first line
+  const firstLine = bulkRawLines[0];
+  const sep = firstLine.includes('\t') ? '\t' : ',';
+  bulkColCount = firstLine.split(sep).length;
+
+  // Build sample values per column (up to 3 rows)
+  const samples = Array.from({length:bulkColCount}, (_,ci)=>
+    bulkRawLines.slice(0,3).map(l=>l.split(sep)[ci]||'').map(v=>v.trim().replace(/^"|"$/g,''))
+  );
+
+  // Auto-guess fields, tracking used to avoid duplicates
+  const usedFields = new Set();
+  bulkColMap = samples.map(s=>{
+    const g = guessField(s, usedFields);
+    if(g) usedFields.add(g);
+    return g;
+  });
+
+  // Render the column mapper
+  const mapEl = document.getElementById('bulkColMapper');
+  mapEl.style.display='';
+  const rowsEl = document.getElementById('bulkColMapRows');
+  rowsEl.innerHTML = bulkColMap.map((field,ci)=>{
+    const preview = samples[ci].filter(Boolean).slice(0,2).join(', ');
+    const opts = FIELD_OPTIONS.map(o=>`<option value="${o.val}" ${o.val===field?'selected':''}>${o.label}</option>`).join('');
+    return `<div style="display:flex;align-items:center;gap:10px;padding:6px 10px;background:var(--cream);border-radius:3px;border:1px solid var(--border)">
+      <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--steel);min-width:20px">C${ci+1}</span>
+      <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--ink);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${x(samples[ci].join(', '))}">${x(preview)||'—'}</span>
+      <select style="font-family:'DM Mono',monospace;font-size:11px;padding:4px 6px;border:1.5px solid var(--border);border-radius:3px;background:var(--paper);color:var(--ink);cursor:pointer" onchange="onColMapChange(${ci},this.value)">${opts}</select>
+    </div>`;
+  }).join('');
+
+  parseBulk();
+}
+
+function onColMapChange(ci, val){
+  bulkColMap[ci] = val;
+  parseBulk();
 }
 
 function parseBulk(){
-  const raw=document.getElementById('bulkInput').value;
-  const lines=raw.split('\n').map(l=>l.trim()).filter(l=>l);
-  bulkParsed=[]; const errs=[];
-  lines.forEach((line,i)=>{
-    const cols=(line.includes('\t')?line.split('\t'):line.split(',')).map(c=>c.trim().replace(/^"|"$/g,'').trim());
+  const raw = document.getElementById('bulkInput').value;
+  bulkRawLines = raw.split('\n').map(l=>l.trim()).filter(l=>l);
+  bulkParsed = [];
+  if(!bulkRawLines.length) return;
+  const sep = bulkRawLines[0].includes('\t') ? '\t' : ',';
 
-    // Assign each column a role by sniffing its content
-    const assigned = { email:'', tier:'', type:'', beat:'', country:'', sector:'', themes:'', notes:'' };
-    const textCols = []; // unclassified — name, outlet, notes candidates
-
-    cols.forEach(val=>{
-      const role = sniffCol(val);
-      if(role==='email' && !assigned.email)        assigned.email   = val;
-      else if(role==='tier' && !assigned.tier)     assigned.tier    = val;
-      else if(role==='type' && !assigned.type)     assigned.type    = val;
-      else if(role==='beat' && !assigned.beat)     assigned.beat    = val;
-      else if(role==='country' && !assigned.country) assigned.country = val;
-      else if(role==='sector' && !assigned.sector) assigned.sector  = val;
-      else if(role==='themes' && !assigned.themes) assigned.themes  = val;
-      else textCols.push(val);
+  bulkRawLines.forEach((line)=>{
+    const cols = line.split(sep).map(c=>c.trim().replace(/^"|"$/g,'').trim());
+    const r = {id:uid(), name:'', email:'N/A', outlet:'', tier:'', beat:'', sector:'', country:'', type:'', themes:'', notes:''};
+    bulkColMap.forEach((field, ci)=>{
+      if(!field || !cols[ci]) return;
+      r[field] = cols[ci];
     });
-
-    // First text col = name, second = outlet, rest = notes
-    const name   = textCols[0] || '';
-    const outlet = textCols[1] || '';
-    if(!assigned.email) assigned.email = 'N/A';
-    const notes  = textCols.slice(2).join(' ').trim();
-
-    if(!name){ errs.push(`Row ${i+1}: missing name`); return; }
-
-    bulkParsed.push({
-      id:uid(), name, email:assigned.email, outlet,
-      tier:assigned.tier, beat:assigned.beat, sector:assigned.sector?normaliseSector(assigned.sector):'',
-      country:assigned.country, type:assigned.type,
-      themes:assigned.themes.replace(/;/g,','), notes
-    });
+    if(!r.name) return; // skip empty rows
+    if(!r.email) r.email = 'N/A';
+    bulkParsed.push(r);
   });
-  const prev=document.getElementById('bulkPreview');
-  const btn =document.getElementById('bulkSaveBtn');
-  if(!lines.length){ prev.innerHTML=''; btn.disabled=true; btn.textContent='Import 0 Reporters'; return; }
-  let html='';
-  if(errs.length) html+=`<div class="preview-err">⚠ ${errs.join(' · ')}</div>`;
-  if(bulkParsed.length){
-    html+=`<div class="preview-ok" style="margin-bottom:7px">✓ ${bulkParsed.length} reporters ready to import</div>`;
-    html+=`<table class="preview-table"><thead><tr><th>Name</th><th>Email</th><th>Outlet</th><th>Tier</th><th>Beat</th><th>Themes</th></tr></thead><tbody>`;
-    html+=bulkParsed.slice(0,6).map(r=>`<tr><td>${x(r.name)}</td><td>${x(r.email)}</td><td>${x(r.outlet)}</td><td>${x(r.tier)}</td><td>${x(r.beat)}</td><td>${x(r.themes)}</td></tr>`).join('');
-    if(bulkParsed.length>6) html+=`<tr><td colspan="6" style="color:var(--steel);font-size:11px;padding:6px 9px">…and ${bulkParsed.length-6} more</td></tr>`;
-    html+=`</tbody></table>`;
-    btn.disabled=false; btn.textContent=`Import ${bulkParsed.length} Reporter${bulkParsed.length!==1?'s':''}`;
-  } else { btn.disabled=true; btn.textContent='Import 0 Reporters'; }
-  prev.innerHTML=html;
+
+  const prev = document.getElementById('bulkPreview');
+  const btn  = document.getElementById('bulkSaveBtn');
+  if(!bulkParsed.length){ prev.innerHTML=''; btn.disabled=true; btn.textContent='Import 0 Reporters'; return; }
+
+  let h = `<div class="preview-ok" style="margin-bottom:7px">✓ ${bulkParsed.length} reporters ready to import</div>`;
+  h += `<table class="preview-table"><thead><tr><th>Name</th><th>Email</th><th>Outlet</th><th>Country</th><th>Sector</th><th>Type</th></tr></thead><tbody>`;
+  h += bulkParsed.slice(0,6).map(r=>`<tr><td>${x(r.name)}</td><td>${x(r.email)}</td><td>${x(r.outlet)}</td><td>${x(r.country)}</td><td>${x(r.sector)}</td><td>${x(r.type)}</td></tr>`).join('');
+  if(bulkParsed.length>6) h+=`<tr><td colspan="6" style="color:var(--steel);font-size:11px;padding:6px 9px">…and ${bulkParsed.length-6} more</td></tr>`;
+  h += `</tbody></table>`;
+  prev.innerHTML = h;
+  btn.disabled = false;
+  btn.textContent = `Import ${bulkParsed.length} Reporter${bulkParsed.length!==1?'s':''}`;
 }
 
 function saveBulk(){
